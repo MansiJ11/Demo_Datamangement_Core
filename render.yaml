@@ -1,10 +1,9 @@
 services:
   - type: web
     name: Diamond_Core
+    runtime: docker
     repo: https://github.com/MansiJ11/Diamond_Core
     branch: main
     rootDir: Diamond_Core
-    buildCommand: dotnet publish -c Release -o out
-    startCommand: dotnet out/Diamond_Core.dll
     plan: free
     autoDeploy: true
