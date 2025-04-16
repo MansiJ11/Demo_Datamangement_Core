@@ -1,7 +1,6 @@
 services:
   - type: web
     name: Diamond_Core
-    runtime: docker
     repo: https://github.com/MansiJ11/Diamond_Core
     branch: main
     rootDir: Diamond_Core
