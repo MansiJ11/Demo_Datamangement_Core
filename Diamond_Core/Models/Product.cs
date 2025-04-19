@@ -22,5 +22,6 @@ namespace RadheDaimond.Models
         public string End_Date { get; set; }
         public string Product_Price { get; set; }
         public string TotalPrice { get; set; }
+        public string TotalAmount { get; set; }
     }
 }

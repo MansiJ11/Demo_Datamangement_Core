@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.Text;
+using Microsoft.AspNetCore.Mvc;
 using RadheDaimond.Helper;
 using RadheDaimond.Models;
 
@@ -90,5 +91,36 @@ namespace Diamond_Core.Controllers
 
             return result.Any() ? Ok(result) : NotFound();
         }
+
+
+
+        [HttpGet("DownloadReport")]
+        public IActionResult DownloadReport(
+            string format = "csv",
+            string? name = null,
+            string? startDate = null,
+            string? endDate = null)
+        {
+            var data = _productHelper.SearchProducts(startDate, endDate, name, 1, 10000);
+
+            decimal totalAmount = data.Sum(p => decimal.TryParse(p.TotalPrice, out var tp) ? tp : 0);
+            string totalAmountStr = totalAmount.ToString("0.00");
+            string timestamp = DateTime.Now.ToString("yyyy-MM-dd_HH-mm");
+
+            if (format.ToLower() == "pdf")
+            {
+                var pdfBytes = _productHelper.GeneratePdf(data, totalAmountStr);
+                return File(pdfBytes, "application/pdf", $"report_{timestamp}.pdf");
+            }
+            else
+            {
+                var csv = _productHelper.GenerateCsv(data, totalAmountStr);
+                var bytes = Encoding.UTF8.GetBytes(csv);
+             
+                return File(bytes, "text/csv", $"report_{timestamp}.csv");
+            }
+        }
+
+
     }
 }

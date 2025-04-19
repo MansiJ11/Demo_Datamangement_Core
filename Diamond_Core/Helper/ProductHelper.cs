@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
+using System.Text;
 using System.Web;
 using MySql.Data.MySqlClient;
 using RadheDaimond.Models;
@@ -291,6 +292,29 @@ namespace RadheDaimond.Helper
             }
 
             return products;
+        }
+
+        public string GenerateCsv(List<Product> products, string totalAmount)
+        {
+            var csv = new StringBuilder();
+            csv.AppendLine("Id,Name,PackageNo,Grams,Start_Date,End_Date,Product_Price,TotalPrice");
+
+            foreach (var p in products)
+            {
+                csv.AppendLine($"{p.Id},{p.Name},{p.PackageNo},{p.Grams},{p.Start_Date},{p.End_Date},{p.Product_Price},{p.TotalPrice}");
+            }
+
+            csv.AppendLine();
+            csv.AppendLine($"Total Amount,,,,,,, {totalAmount}");
+
+            return csv.ToString();
+        }
+
+        public byte[] GeneratePdf(List<Product> products, string totalAmount)
+        {
+            // Placeholder: Implement this using QuestPDF or any other PDF library
+            var dummyPdfContent = Encoding.UTF8.GetBytes("PDF generation not implemented.");
+            return dummyPdfContent;
         }
 
     }
