@@ -105,7 +105,7 @@ namespace RadheDaimond.Helper
         }
 
 
-        public bool InsertProduct(Product product)
+        public bool InsertProduct(AddProductRequest product)
         {
             using (MySqlConnection conn = new MySqlConnection(connStr))
             {
@@ -126,7 +126,7 @@ namespace RadheDaimond.Helper
         }
 
 
-        public bool UpdateProduct(Product product,int id)
+        public bool UpdateProduct(EditProductRequest product,int id)
         {
             using (MySqlConnection conn = new MySqlConnection(connStr))
             {

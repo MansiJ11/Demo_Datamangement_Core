@@ -33,7 +33,7 @@ namespace Diamond_Core.Controllers
         }
 
         [HttpPost("AddProduct")]
-        public IActionResult Post([FromBody] Product value)
+        public IActionResult Post([FromBody] AddProductRequest value)
         {
             if (value == null)
                 return BadRequest("Product data is null.");
@@ -44,7 +44,7 @@ namespace Diamond_Core.Controllers
         }
 
         [HttpPut("EditProduct/{id}")]
-        public IActionResult Put(int id, [FromBody] Product value)
+        public IActionResult Put(int id, [FromBody] EditProductRequest value)
         {
             if (value == null)
                 return BadRequest("Product request is null.");
