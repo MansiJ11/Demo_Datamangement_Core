@@ -256,10 +256,9 @@ namespace RadheDaimond.Helper
 
                 int offset = (pageNumber - 1) * pageSize;
                 string query = $@"
-            SELECT * FROM product 
-            {whereClause}
-            LIMIT @PageSize OFFSET @Offset";
-
+        SELECT * FROM product 
+        {whereClause}
+        LIMIT @PageSize OFFSET @Offset";
                 using (MySqlCommand cmd = new MySqlCommand(query, conn))
                 {
                     if (!string.IsNullOrWhiteSpace(startDate))
