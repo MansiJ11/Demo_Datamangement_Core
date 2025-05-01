@@ -18,12 +18,29 @@ namespace Diamond_Core.Controllers
             _productHelper = new ProductHelper(configuration);
         }
 
+        //[HttpGet("GetAll")]
+        //public ActionResult<IEnumerable<Product>> Get()
+        //{
+        //    var res = _productHelper.GetAllProducts();
+        //    return Ok(res);
+        //}
+
         [HttpGet("GetAll")]
-        public ActionResult<IEnumerable<Product>> Get()
+        public IActionResult Get([FromQuery] int page = 1, [FromQuery] int size = 10)
         {
-            var res = _productHelper.GetAllProducts();
-            return Ok(res);
+            int totalRecords;
+            var products = _productHelper.GetAllProducts(page, size, out totalRecords);
+
+            return Ok(new
+            {
+                TotalRecords = totalRecords,
+                Page = page,
+                PageSize = size,
+                TotalPages = (int)Math.Ceiling((double)totalRecords / size),
+                Data = products
+            });
         }
+
 
         [HttpGet("GetOne/{id}")]
         public ActionResult<Product> GetOne(int id)

@@ -31,43 +31,59 @@ namespace RadheDaimond.Helper
         }
 
 
-        public List<Product> GetAllProducts()
+        public List<Product> GetAllProducts(int pageNumber, int pageSize, out int totalRecords)
         {
             List<Product> products = new List<Product>();
+            totalRecords = 0;
 
             using (MySqlConnection conn = new MySqlConnection(connStr))
             {
                 conn.Open();
-                string query = "SELECT * FROM product"; // Adjust your query to your table structure
+
+                // 1. Get total count for pagination
+                using (MySqlCommand countCmd = new MySqlCommand("SELECT COUNT(*) FROM product", conn))
+                {
+                    totalRecords = Convert.ToInt32(countCmd.ExecuteScalar());
+                }
+
+                // 2. Get paginated data
+                int offset = (pageNumber - 1) * pageSize;
+                string query = "SELECT * FROM product ORDER BY Id LIMIT @Limit OFFSET @Offset";
 
                 using (MySqlCommand cmd = new MySqlCommand(query, conn))
-                using (MySqlDataReader reader = cmd.ExecuteReader())
                 {
-                    while (reader.Read())
-                    {
-                        string gramsStr = reader["Grams"]?.ToString();
-                        string priceStr = reader["Product_Price"]?.ToString();
+                    cmd.Parameters.AddWithValue("@Limit", pageSize);
+                    cmd.Parameters.AddWithValue("@Offset", offset);
 
-                        // Calculate total price
-                        string totalPrice = CalculateTotalPrice(gramsStr, priceStr);
-                        var product = new Product
+                    using (MySqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
                         {
-                            Id = reader.GetInt32("Id"),
-                            Name = reader.GetString("Name"),
-                            PackageNo = reader.GetString("PackageNo"),
-                            Grams = gramsStr,
-                            Start_Date = reader.GetString("Start_Date"),
-                            End_Date = reader["End_Date"]?.ToString(),
-                            Product_Price = priceStr,
-                            TotalPrice = totalPrice
-                        };
-                        products.Add(product);
+                            string gramsStr = reader["Grams"]?.ToString();
+                            string priceStr = reader["Product_Price"]?.ToString();
+                            string totalPrice = CalculateTotalPrice(gramsStr, priceStr);
+
+                            var product = new Product
+                            {
+                                Id = reader.GetInt32("Id"),
+                                Name = reader.GetString("Name"),
+                                PackageNo = reader.GetString("PackageNo"),
+                                Grams = gramsStr,
+                                Start_Date = reader.GetString("Start_Date"),
+                                End_Date = reader["End_Date"]?.ToString(),
+                                Product_Price = priceStr,
+                                TotalPrice = totalPrice
+                            };
+
+                            products.Add(product);
+                        }
                     }
                 }
             }
 
             return products;
         }
+
 
 
         public Product GetOneProducts(int Id)

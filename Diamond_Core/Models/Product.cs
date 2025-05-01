@@ -44,4 +44,13 @@ namespace RadheDaimond.Models
 
 
     }
+
+    public class Pagination
+    {
+        [Required]
+        public int Page { get; set; }
+
+        [Required]
+        public int Size { get; set; }
+    }
 }
