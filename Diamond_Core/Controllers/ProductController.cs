@@ -107,7 +107,7 @@ namespace Diamond_Core.Controllers
         [HttpGet("Search")]
         public IActionResult Search(string? startDate = null, string? endDate = null, string? name = null, int pageNumber = 1, int pageSize = 10)
         {
-            var result = _productHelper.SearchProducts(startDate, endDate, name, pageNumber, pageSize);
+            var result = _productHelper.SearchProducts(startDate, endDate, name, 1, 1, true);
 
             return result.Any() ? Ok(result) : NotFound();
         }
