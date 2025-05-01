@@ -121,7 +121,7 @@ namespace Diamond_Core.Controllers
             string? startDate = null,
             string? endDate = null)
         {
-            var data = _productHelper.SearchProducts(startDate, endDate, name, 1, 10000);
+            var data = _productHelper.SearchProducts(startDate, endDate, name, 1, 1, true); // ignorePagination = true
 
             decimal totalAmount = data.Sum(p => decimal.TryParse(p.TotalPrice, out var tp) ? tp : 0);
             string totalAmountStr = totalAmount.ToString("0.00");
