@@ -15,24 +15,6 @@ dist-ssr
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
-
-# Ignore Visual Studio files
-.vs/
-*.user
-*.suo
-
-# Ignore build output
-bin/
-obj/
-
-# Ignore published files
-*.Publish.xml
-*.dbmdl
-
-# Ignore OS files
-Thumbs.db
-.DS_Store
-
 .idea
 .DS_Store
 *.suo
