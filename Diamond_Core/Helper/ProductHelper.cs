@@ -31,22 +31,22 @@ namespace RadheDaimond.Helper
         }
 
 
-        public List<Product> GetAllProducts(int pageNumber, int pageSize, out int totalRecords)
+        public List<Product> GetAllProducts(int pageNumber, int pageSize, out int totalRecords, out string totalAmount)
         {
             List<Product> products = new List<Product>();
             totalRecords = 0;
+            decimal total = 0;
 
             using (MySqlConnection conn = new MySqlConnection(connStr))
             {
                 conn.Open();
 
-                // 1. Get total count for pagination
+                // Count total records
                 using (MySqlCommand countCmd = new MySqlCommand("SELECT COUNT(*) FROM product", conn))
                 {
                     totalRecords = Convert.ToInt32(countCmd.ExecuteScalar());
                 }
 
-                // 2. Get paginated data
                 int offset = (pageNumber - 1) * pageSize;
                 string query = "SELECT * FROM product ORDER BY Id LIMIT @Limit OFFSET @Offset";
 
@@ -63,6 +63,10 @@ namespace RadheDaimond.Helper
                             string priceStr = reader["Product_Price"]?.ToString();
                             string totalPrice = CalculateTotalPrice(gramsStr, priceStr);
 
+                            decimal parsedTotal = 0;
+                            decimal.TryParse(totalPrice, out parsedTotal);
+                            total += parsedTotal;
+
                             var product = new Product
                             {
                                 Id = reader.GetInt32("Id"),
@@ -72,7 +76,8 @@ namespace RadheDaimond.Helper
                                 Start_Date = reader.GetString("Start_Date"),
                                 End_Date = reader["End_Date"]?.ToString(),
                                 Product_Price = priceStr,
-                                TotalPrice = totalPrice
+                                TotalPrice = totalPrice,
+                                TotalAmount = "" // You can leave this blank or set later
                             };
 
                             products.Add(product);
@@ -81,6 +86,7 @@ namespace RadheDaimond.Helper
                 }
             }
 
+            totalAmount = total.ToString("F2"); // e.g., "15000.50"
             return products;
         }
 

@@ -29,7 +29,8 @@ namespace Diamond_Core.Controllers
         public IActionResult Get([FromQuery] int page = 1, [FromQuery] int size = 10)
         {
             int totalRecords;
-            var products = _productHelper.GetAllProducts(page, size, out totalRecords);
+            string totalAmount;
+            var products = _productHelper.GetAllProducts(page, size, out totalRecords, out totalAmount);
 
             return Ok(new
             {
@@ -37,9 +38,11 @@ namespace Diamond_Core.Controllers
                 Page = page,
                 PageSize = size,
                 TotalPages = (int)Math.Ceiling((double)totalRecords / size),
+                TotalAmount = totalAmount,
                 Data = products
             });
         }
+
 
 
         [HttpGet("GetOne/{id}")]
