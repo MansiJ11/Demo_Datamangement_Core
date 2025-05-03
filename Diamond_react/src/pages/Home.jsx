@@ -16,12 +16,16 @@ const Home = () => {
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
   const [name, setName] = useState('');
+  const [isSearch, setIsSearch] = useState(false);
 
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10); // Can be updated by user
   const [totalItems, setTotalItems] = useState(0); // Set from API
   const [totalPages, setTotalPages] = useState(0); // Set from API
   const [totalPrice, setTotalPrice] = useState(0); // Set from API
+
+  const [startType, setStartType] = useState("text");
+  const [endType, setEndType] = useState("text");
 
   useEffect(() => {
     getPaginationButtons();
@@ -78,7 +82,7 @@ const Home = () => {
 
   const fetchList = async (page, size, download) => {
     setLoading(true);
-    if(!download){
+    if (!download) {
       setShowData([]);
     }
     try {
@@ -138,6 +142,7 @@ const Home = () => {
 
   const handleSearch = async () => {
     try {
+
       setLoading(true);
 
       // Construct search URL with query params
@@ -155,8 +160,12 @@ const Home = () => {
 
       const data = await response.json();
       console.log("search data:", data);
+
       setShowData(data); // Update table with searched data
+      setIsSearch(true)
       setTotalItems(10)
+
+      return data
     } catch (error) {
       console.error('Error fetching search results:', error);
       alert('Error searching products');
@@ -167,7 +176,13 @@ const Home = () => {
 
   const handleDownloadPDF = async () => {
 
-    const data = await fetchList(currentPage, totalItems, true); // Fetch data for PDF download
+    let data = [] // Fetch data for PDF download
+
+    if (isSearch) {
+      data = await handleSearch()
+    } else {
+      data = await fetchList(currentPage, totalItems, true); // Fetch data for PDF download
+    }
 
     const doc = new jsPDF();
 
@@ -261,26 +276,36 @@ const Home = () => {
       </h1>
       <div className="flex flex-col items-end mb-4">
 
-      
-      <button className="bg-white text-black rounded px-6 py-2 mb-4 hover:bg-gray-100 text-center shadow-xl" onClick={() => navigate('/DimandForm')}>
-        <span role="img" aria-label="add" className="text-white">➕</span>
-        Add New Diamond
-      </button>
-</div>
+
+        <button className="bg-white text-black rounded px-6 py-2 mb-4 hover:bg-gray-100 text-center shadow-xl" onClick={() => navigate('/DimandForm')}>
+          <span role="img" aria-label="add" className="text-white">➕</span>
+          Add New Diamond
+        </button>
+      </div>
 
       {/* Filter Section */}
       <div className="bg-white shadow-lg rounded-lg p-4 mb-6 grid grid-cols-1 md:grid-cols-4 gap-4">
 
-        <input type="date" value={startDate} placeholder="Enter date" className="border rounded px-4 py-2 w-full" onChange={handleStartDateChange} />
+        <input 
+          type={startType} 
+          value={startDate} 
+          onFocus={() => setStartType("date")}
+          onBlur={() => startDate === "" && setStartType("text")}
+          placeholder="Start date" 
+          className="border rounded px-4 py-2 w-full"
+           onChange={handleStartDateChange} 
+        />
         <input
-          type="date"
+          type={endType}
           value={endDate}
+          onFocus={() => setEndType("date")}
+          onBlur={() => endDate === "" && setEndType("text")}
           className="border rounded px-4 py-2 w-full"
           placeholder="End Date"
           onChange={handleEndDateChange}
         />
         <input
-          type="text"
+          type='text'
           value={name}
           onChange={handleNameChange}
           className="border rounded px-4 py-2 w-full"
@@ -291,7 +316,7 @@ const Home = () => {
           Search
         </button>
       </div>
-      
+
 
       {/* Table Section */}
       <div className="overflow-x-auto bg-white shadow-lg rounded-lg">
@@ -315,7 +340,7 @@ const Home = () => {
             }
             {showData && showData.map((item, idx) => (
               <tr key={idx} className="border-t hover:bg-gray-50">
-                <td className="px-4 py-2">{Number((currentPage -1) * 10)+Number(idx + 1)}</td>
+                <td className="px-4 py-2">{Number((currentPage - 1) * 10) + Number(idx + 1)}</td>
                 <td className="px-4 py-2">{item.name}</td>
                 <td className="px-4 py-2">{item.packageNo}</td>
                 <td className="px-4 py-2">{item.grams}</td>
@@ -347,8 +372,8 @@ const Home = () => {
           <button
             key={i}
             className={`px-3 py-1 rounded text-sm font-medium ${btn === currentPage
-                ? 'bg-btnAdd text-white'
-                : 'bg-gray-300 hover:bg-gray-400'
+              ? 'bg-btnAdd text-white'
+              : 'bg-gray-300 hover:bg-gray-400'
               }`}
             onClick={() => handlePageChange(btn)}
             disabled={btn === '...' || btn === currentPage}
