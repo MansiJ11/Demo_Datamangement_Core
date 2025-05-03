@@ -104,14 +104,24 @@ namespace Diamond_Core.Controllers
             return result.Any() ? Ok(result) : NotFound();
         }
 
+        //[HttpGet("Search")]
+        //public IActionResult Search(string? startDate = null, string? endDate = null, string? name = null, int pageNumber = 1, int pageSize = 10)
+        //{
+        //    var result = _productHelper.SearchProducts(startDate, endDate, name, 1, 1, true);
+
+        //    return Ok(result);
+        //}
         [HttpGet("Search")]
-        public IActionResult Search(string? startDate = null, string? endDate = null, string? name = null, int pageNumber = 1, int pageSize = 10)
+        public IActionResult Search(
+    string? startDate = null,
+    string? endDate = null,
+    string? name = null,
+    int pageNumber = 1,
+    int pageSize = 10)
         {
-            var result = _productHelper.SearchProducts(startDate, endDate, name, 1, 1, true);
-
-            return result.Any() ? Ok(result) : NotFound();
+            var result = _productHelper.SearchProducts(startDate, endDate, name, pageNumber, pageSize, false);
+            return Ok(result);
         }
-
 
 
         [HttpGet("DownloadReport")]
