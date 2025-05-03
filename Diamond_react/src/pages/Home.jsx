@@ -131,7 +131,7 @@ const Home = () => {
       }
 
       alert('Product deleted successfully');
-      fetchList();
+      fetchList(1, pageSize, false); // Refresh the list after deletion
     } catch (error) {
       console.error('Error deleting product:', error);
       alert('Error deleting product');
@@ -355,7 +355,7 @@ const Home = () => {
                   <button className="bg-btnAdd text-white px-3 py-1 rounded hover:bg-blue-600" onClick={() => navigate('/DimandForm', { state: { data: item } })}>
                     Edit
                   </button>
-                  <button className="bg-delete text-white px-3 py-1 rounded hover:bg-red-600" onClick={() => handleDelete(item.id)}>
+                  <button className="bg-delete text-white px-3 py-1 rounded hover:bg-red-600" onClick={() =>{ setCurrentPage(1); handleDelete(item.id)}}>
                     Delete
                   </button>
                 </td>
