@@ -144,12 +144,11 @@ const Home = () => {
     try {
 
       setLoading(true);
-
       // Construct search URL with query params
       const queryParams = new URLSearchParams({
         startDate,
         endDate,
-        name
+        name,
       }).toString();
 
       const response = await fetch(`https://diamond-core.onrender.com/api/Product/Search?${queryParams}`);
@@ -161,11 +160,12 @@ const Home = () => {
       const data = await response.json();
       console.log("search data:", data);
 
-      setShowData(data); // Update table with searched data
+      setShowData(data.products); // Update table with searched data
       setIsSearch(true)
       setTotalItems(10)
+      setTotalPrice(data.totalAmount); // Set total price from API response
 
-      return data
+      return data.products
     } catch (error) {
       console.error('Error fetching search results:', error);
       alert('Error searching products');
@@ -188,8 +188,8 @@ const Home = () => {
 
     const pageWidth = doc.internal.pageSize.getWidth();
 
-    const title = "Daimond List";
-    const totalPriceText = `Total Price: ${totalPrice}`;
+    const title = "Radhe Diamond";
+    const totalPriceText = `Total Amount: ${totalPrice}`;
 
     // Center the title
     doc.setFontSize(14);
@@ -203,24 +203,22 @@ const Home = () => {
 
     // Table
     const columns = [
-      "SN.",
+      "Issue Date",
       "Name",
       "Package No",
       "Crt",
       "Product Price",
       "Total Price",
-      "Start Date",
-      "End Date"
+      "Return date"
     ];
 
     const rows = data.map((item, index) => [
-      index + 1,
+      item.start_Date,
       item.name,
       item.packageNo,
       item.grams,
       item.product_Price,
       item.totalPrice,
-      item.start_Date,
       item.end_Date
     ]);
 
@@ -231,34 +229,39 @@ const Home = () => {
       styles: { fontSize: 8 },
     });
 
-    doc.save('diamond-list.pdf');
+    doc.save('Radhe-Diamond.pdf');
   };
 
 
   const handleDownloadExcel = async () => {
 
-    const data = await fetchList(currentPage, totalItems, true); // Fetch data for PDF download
+    let data = [] // Fetch data for PDF download
+
+    if (isSearch) {
+      data = await handleSearch()
+    } else {
+      data = await fetchList(currentPage, totalItems, true); // Fetch data for PDF download
+    }
 
     const workbook = XLSX.utils.book_new();
 
     // Create data rows
     const dataRows = data.map((item, index) => ({
-      SN: index + 1,
+      IssueDate: item.start_Date,
       Name: item.name,
       PackageNo: item.packageNo,
       Crt: item.grams,
       ProductPrice: item.product_Price,
       TotalPrice: item.totalPrice,
-      StartDate: item.start_Date,
-      EndDate: item.end_Date
+      ReturnDate: item.end_Date
     }));
 
     // Create worksheet from data
     const worksheet = XLSX.utils.json_to_sheet(dataRows, { origin: "A3" });
 
     // Add title and total price manually
-    XLSX.utils.sheet_add_aoa(worksheet, [["Diamond List"]], { origin: "A1" });
-    XLSX.utils.sheet_add_aoa(worksheet, [[`Total Price: ${totalPrice}`]], { origin: "F2" }); // Adjust column F or G if needed
+    XLSX.utils.sheet_add_aoa(worksheet, [["Radhe Diamond"]], { origin: "A1" });
+    XLSX.utils.sheet_add_aoa(worksheet, [[`Total Amount: ${totalPrice}`]], { origin: "F2" }); // Adjust column F or G if needed
 
     // Merge cells for title row (A1 to H1)
     if (!worksheet["!merges"]) worksheet["!merges"] = [];
@@ -266,13 +269,13 @@ const Home = () => {
 
     XLSX.utils.book_append_sheet(workbook, worksheet, "Diamond");
 
-    XLSX.writeFile(workbook, "diamond-list.xlsx");
+    XLSX.writeFile(workbook, "Radhe-Diamond.xlsx");
   };
 
   return (
     <div className="max-w-7xl mx-auto p-4">
       <h1 className="text-3xl font-bold text-center mb-6 flex items-center justify-center gap-2">
-        <span role="img" aria-label="diamond">💎</span> Diamond List
+        <span role="img" aria-label="diamond">💎</span> Radhe Diamond
       </h1>
       <div className="flex flex-col items-end mb-4">
 
@@ -291,7 +294,7 @@ const Home = () => {
           value={startDate} 
           onFocus={() => setStartType("date")}
           onBlur={() => startDate === "" && setStartType("text")}
-          placeholder="Start date" 
+          placeholder="Issue Date" 
           className="border rounded px-4 py-2 w-full"
            onChange={handleStartDateChange} 
         />
@@ -301,7 +304,7 @@ const Home = () => {
           onFocus={() => setEndType("date")}
           onBlur={() => endDate === "" && setEndType("text")}
           className="border rounded px-4 py-2 w-full"
-          placeholder="End Date"
+          placeholder="Return date"
           onChange={handleEndDateChange}
         />
         <input
@@ -324,13 +327,13 @@ const Home = () => {
           <thead className="bg-gray-100">
             <tr>
               <th className="px-4 py-3">SN</th>
+              <th className="px-4 py-3">Issue Date</th>
               <th className="px-4 py-3">Name</th>
               <th className="px-4 py-3">Package No</th>
               <th className="px-4 py-3">Crt</th>
               <th className="px-4 py-3">Product Price</th>
               <th className="px-4 py-3">Total Price</th>
-              <th className="px-4 py-3">Start Date</th>
-              <th className="px-4 py-3">End Date</th>
+              <th className="px-4 py-3">Return date</th>
               <th className="px-4 py-3">Action</th>
             </tr>
           </thead>
@@ -341,12 +344,12 @@ const Home = () => {
             {showData && showData.map((item, idx) => (
               <tr key={idx} className="border-t hover:bg-gray-50">
                 <td className="px-4 py-2">{Number((currentPage - 1) * 10) + Number(idx + 1)}</td>
+                <td className="px-4 py-2">{item.start_Date}</td>
                 <td className="px-4 py-2">{item.name}</td>
                 <td className="px-4 py-2">{item.packageNo}</td>
                 <td className="px-4 py-2">{item.grams}</td>
                 <td className="px-4 py-2">{item.product_Price}</td>
                 <td className="px-4 py-2">{item.totalPrice}</td>
-                <td className="px-4 py-2">{item.start_Date}</td>
                 <td className="px-4 py-2">{item.end_Date}</td>
                 <td className="px-4 py-2 space-x-2">
                   <button className="bg-btnAdd text-white px-3 py-1 rounded hover:bg-blue-600" onClick={() => navigate('/DimandForm', { state: { data: item } })}>

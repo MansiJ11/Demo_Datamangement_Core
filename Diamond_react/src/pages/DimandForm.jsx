@@ -10,7 +10,6 @@ const DimandForm = () => {
         packageNo: '',
         grams: '',
         product_Price: '',
-        totalPrice: '',
         end_Date: '',
         start_Date: ''
     });
@@ -29,7 +28,6 @@ const DimandForm = () => {
                 packageNo: state.data.packageNo,
                 grams: state.data.grams,
                 product_Price: state.data.product_Price,
-                totalPrice: state.data.totalPrice,
                 end_Date: state.data.end_Date,
                 start_Date: state.data.start_Date
             });
@@ -55,17 +53,17 @@ const DimandForm = () => {
 
         e.preventDefault();
 
-        const { name, packageNo, grams, product_Price, totalPrice, start_Date, end_Date } = formData;
+        const { name, packageNo, grams, product_Price, start_Date, end_Date } = formData;
 
         // Basic validation
-        if (!name || !packageNo || !grams || !product_Price || !totalPrice || !start_Date) {
+        if (!name || !packageNo || !grams || !start_Date) {
             setError('Please fill in all fields.');
             setLoading(false);
             return;
         }
 
-        if (Number(grams) <= 0 || Number(product_Price) <= 0 || Number(totalPrice) <= 0) {
-            setError('Grams, Product Price, and Total Price must be positive numbers.');
+        if (Number(grams) <= 0 ) {
+            setError('Grams and Product Price must be positive numbers.');
             setLoading(false);
             return;
         }
@@ -117,8 +115,6 @@ const DimandForm = () => {
                         PackageNo: packageNo,
                         Grams: grams,
                         Product_Price: product_Price,
-                        TotalPrice: totalPrice,
-                        TotalAmount: totalPrice,
                         Start_Date: start_Date,
                         End_Date: end_Date
                     })
@@ -138,7 +134,6 @@ const DimandForm = () => {
                         packageNo: '',
                         grams: '',
                         product_Price: '',
-                        totalPrice: '',
                         end_Date: '',
                         start_Date: ''
                     });
@@ -163,7 +158,7 @@ const DimandForm = () => {
                 className="bg-white p-8 rounded-xl shadow-md w-full max-w-7xl sm:min-w-md my-8"
             >
                 <h2 className="text-2xl font-bold mb-6 text-gray-800 text-center">
-                    <span role="img" aria-label="diamond">💎</span>Diamond Form
+                    <span role="img" aria-label="diamond">💎</span>{isEdit ? 'Edit' : 'Create'} Diamond Form
                 </h2>
 
                 {(error || success || loading) && (
@@ -236,7 +231,7 @@ const DimandForm = () => {
                     </div>
 
                     {/* Product Price */}
-                    <div>
+                    {isEdit && <div>
                         <label className="block text-gray-600 mb-2" htmlFor="product_Price">Product Price</label>
                         <input
                             type="number"
@@ -248,26 +243,11 @@ const DimandForm = () => {
                             className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
                             required
                         />
-                    </div>
-
-                    {/* Total Price */}
-                    <div>
-                        <label className="block text-gray-600 mb-2" htmlFor="totalPrice">Total Price</label>
-                        <input
-                            type="number"
-                            name="totalPrice"
-                            id="totalPrice"
-                            value={formData.totalPrice}
-                            onChange={handleChange}
-                            placeholder="Total Price"
-                            className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
-                            required
-                        />
-                    </div>
+                    </div>}
 
                     {/* Start Date */}
                     <div>
-                        <label className="block text-gray-600 mb-2" htmlFor="start_Date">Start Date</label>
+                        <label className="block text-gray-600 mb-2" htmlFor="start_Date">Issue Date</label>
                         <input
                             type="date"
                             name="start_Date"
@@ -281,8 +261,8 @@ const DimandForm = () => {
                     </div>
 
                     {/* End Date */}
-                    <div>
-                        <label className="block text-gray-600 mb-2" htmlFor="end_Date">End Date</label>
+                    {isEdit && <div>
+                        <label className="block text-gray-600 mb-2" htmlFor="end_Date">Return date</label>
                         <input
                             type="date"
                             name="end_Date"
@@ -291,7 +271,7 @@ const DimandForm = () => {
                             onChange={handleChange}
                             className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
                         />
-                    </div>
+                    </div>}
                 </div>
 
                 {/* Buttons */}
