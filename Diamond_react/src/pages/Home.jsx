@@ -301,7 +301,7 @@ const Home = () => {
               <th className="px-4 py-3">SN</th>
               <th className="px-4 py-3">Name</th>
               <th className="px-4 py-3">Package No</th>
-              <th className="px-4 py-3">Ct</th>
+              <th className="px-4 py-3">Crt</th>
               <th className="px-4 py-3">Product Price</th>
               <th className="px-4 py-3">Total Price</th>
               <th className="px-4 py-3">Start Date</th>
