@@ -34,7 +34,7 @@ const Home = () => {
 
   const getPaginationButtons = () => {
     const totalPages = Math.ceil(totalItems / pageSize);
-    setTotalPrice(totalPages)
+    setTotalPages(totalPages);
     const buttons = [];
 
     if (currentPage > 1) buttons.push('Prev');
