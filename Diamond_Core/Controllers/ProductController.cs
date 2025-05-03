@@ -18,13 +18,6 @@ namespace Diamond_Core.Controllers
             _productHelper = new ProductHelper(configuration);
         }
 
-        //[HttpGet("GetAll")]
-        //public ActionResult<IEnumerable<Product>> Get()
-        //{
-        //    var res = _productHelper.GetAllProducts();
-        //    return Ok(res);
-        //}
-
         [HttpGet("GetAll")]
         public IActionResult Get([FromQuery] int page = 1, [FromQuery] int size = 10)
         {
@@ -104,20 +97,8 @@ namespace Diamond_Core.Controllers
             return result.Any() ? Ok(result) : NotFound();
         }
 
-        //[HttpGet("Search")]
-        //public IActionResult Search(string? startDate = null, string? endDate = null, string? name = null, int pageNumber = 1, int pageSize = 10)
-        //{
-        //    var result = _productHelper.SearchProducts(startDate, endDate, name, 1, 1, true);
-
-        //    return Ok(result);
-        //}
         [HttpGet("Search")]
-        public IActionResult Search(
-    string? startDate = null,
-    string? endDate = null,
-    string? name = null,
-    int pageNumber = 1,
-    int pageSize = 10)
+        public IActionResult Search(string? startDate = null,string? endDate = null,string? name = null,int pageNumber = 1,int pageSize = 10)
         {
             var result = _productHelper.SearchProducts(startDate, endDate, name, pageNumber, pageSize, false);
             return Ok(result);

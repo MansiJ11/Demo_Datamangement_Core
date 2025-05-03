@@ -53,4 +53,11 @@ namespace RadheDaimond.Models
         [Required]
         public int Size { get; set; }
     }
+
+    public class ProductSearchResult
+    {
+        public List<Product> Products { get; set; }
+        public string TotalAmount { get; set; }
+    }
+
 }
