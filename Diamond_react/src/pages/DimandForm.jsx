@@ -154,13 +154,20 @@ const DimandForm = () => {
         }
 
     };
+
+
     return (
         <div className="flex items-center justify-center min-h-screen bg-gray-100">
-            <form onSubmit={handleSubmit} className="bg-white p-8 rounded-xl shadow-md w-full max-w-7xl sm:min-w-md my-8">
-                <h2 className="text-2xl font-bold mb-6 text-gray-800 text-center">Diamond Form</h2>
+            <form
+                onSubmit={handleSubmit}
+                className="bg-white p-8 rounded-xl shadow-md w-full max-w-7xl sm:min-w-md my-8"
+            >
+                <h2 className="text-2xl font-bold mb-6 text-gray-800 text-center">
+                    <span role="img" aria-label="diamond">💎</span>Diamond Form
+                </h2>
 
                 {(error || success || loading) && (
-                    <div className="top-4 w-full max-w-md px-4">
+                    <div className="mb-6 w-full">
                         {error && (
                             <div className="bg-red-100 text-red-700 px-4 py-2 rounded mb-2 shadow">
                                 {error}
@@ -172,128 +179,141 @@ const DimandForm = () => {
                             </div>
                         )}
                         {loading && (
-                            <div className="bg-blue-100 text-blue-700 px-4 py-2 rounded mb-2 shadow">
+                            <div className="bg-blue-100 text-btnAdd px-4 py-2 rounded mb-2 shadow">
                                 Submitting...
                             </div>
                         )}
                     </div>
                 )}
 
-                <div className="mb-4">
-                    <label className="block text-gray-600 mb-2" htmlFor="name">Name</label>
-                    <input
-                        type="text"
-                        name="name"
-                        id="name"
-                        value={formData.name}
-                        onChange={handleChange}
-                        className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
-                        placeholder="Enter your name"
-                        required
-                        disabled={isEdit}
-                    />
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {/* Name */}
+                    <div>
+                        <label className="block text-gray-600 mb-2" htmlFor="name">Name</label>
+                        <input
+                            type="text"
+                            name="name"
+                            id="name"
+                            value={formData.name}
+                            onChange={handleChange}
+                            className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+                            placeholder="Enter your name"
+                            required
+                            disabled={isEdit}
+                        />
+                    </div>
+
+                    {/* Package No */}
+                    <div>
+                        <label className="block text-gray-600 mb-2" htmlFor="packageNo">Package No</label>
+                        <input
+                            type="text"
+                            name="packageNo"
+                            id="packageNo"
+                            value={formData.packageNo}
+                            onChange={handleChange}
+                            className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+                            placeholder="Enter package no"
+                            required
+                            disabled={isEdit}
+                        />
+                    </div>
+
+                    {/* Crt */}
+                    <div>
+                        <label className="block text-gray-600 mb-2" htmlFor="grams">Crt</label>
+                        <input
+                            type="number"
+                            name="grams"
+                            id="grams"
+                            value={formData.grams}
+                            placeholder="Crt"
+                            onChange={handleChange}
+                            className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+                            required
+                            disabled={isEdit}
+                        />
+                    </div>
+
+                    {/* Product Price */}
+                    <div>
+                        <label className="block text-gray-600 mb-2" htmlFor="product_Price">Product Price</label>
+                        <input
+                            type="number"
+                            name="product_Price"
+                            id="product_Price"
+                            value={formData.product_Price}
+                            placeholder="Product Price"
+                            onChange={handleChange}
+                            className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+                            required
+                        />
+                    </div>
+
+                    {/* Total Price */}
+                    <div>
+                        <label className="block text-gray-600 mb-2" htmlFor="totalPrice">Total Price</label>
+                        <input
+                            type="number"
+                            name="totalPrice"
+                            id="totalPrice"
+                            value={formData.totalPrice}
+                            onChange={handleChange}
+                            placeholder="Total Price"
+                            className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+                            required
+                        />
+                    </div>
+
+                    {/* Start Date */}
+                    <div>
+                        <label className="block text-gray-600 mb-2" htmlFor="start_Date">Start Date</label>
+                        <input
+                            type="date"
+                            name="start_Date"
+                            id="start_Date"
+                            value={formData.start_Date}
+                            onChange={handleChange}
+                            className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+                            required
+                            disabled={isEdit}
+                        />
+                    </div>
+
+                    {/* End Date */}
+                    <div>
+                        <label className="block text-gray-600 mb-2" htmlFor="end_Date">End Date</label>
+                        <input
+                            type="date"
+                            name="end_Date"
+                            id="end_Date"
+                            value={formData.end_Date}
+                            onChange={handleChange}
+                            className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+                        />
+                    </div>
                 </div>
 
-                <div className="mb-4">
-                    <label className="block text-gray-600 mb-2" htmlFor="email">packageNo</label>
-                    <input
-                        type="text"
-                        name="packageNo"
-                        id="packageNo"
-                        value={formData.packageNo}
-                        onChange={handleChange}
-                        className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
-                        placeholder="Enter your email"
-                        required
-                        disabled={isEdit}
-                    />
-                </div>
-
-                <div className="mb-6">
-                    <label className="block text-gray-600 mb-2" htmlFor="favoriteColor">Crt</label>
-                    <input
-                        type="number"
-                        name="grams"
-                        id="grams"
-                        value={formData.grams}
-                        onChange={handleChange}
-                        className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
-                        required
-                        disabled={isEdit}
-                    />
-                </div>
-
-                <div className="mb-6">
-                    <label className="block text-gray-600 mb-2" htmlFor="favoriteColor">product_Price</label>
-                    <input
-                        type="number"
-                        name="product_Price"
-                        id="product_Price"
-                        value={formData.product_Price}
-                        onChange={handleChange}
-                        className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
-                        required
-                    />
-                </div>
-
-                <div className="mb-6">
-                    <label className="block text-gray-600 mb-2" htmlFor="favoriteColor">totalPrice</label>
-                    <input
-                        type="number"
-                        name="totalPrice"
-                        id="totalPrice"
-                        value={formData.totalPrice}
-                        onChange={handleChange}
-                        className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
-                        required
-                    />
-                </div>
-
-                <div className="mb-6">
-                    <label className="block text-gray-600 mb-2" htmlFor="favoriteColor">start_Date</label>
-                    <input
-                        type="date"
-                        name="start_Date"
-                        id="start_Date"
-                        value={formData.start_Date}
-                        onChange={handleChange}
-                        className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
-                        required
-                        disabled={isEdit}
-                    />
-                </div>
-
-                <div className="mb-6">
-                    <label className="block text-gray-600 mb-2" htmlFor="favoriteColor">end_Date</label>
-                    <input
-                        type="date"
-                        name="end_Date"
-                        id="end_Date"
-                        value={formData.end_Date}
-                        onChange={handleChange}
-                        className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
-                    />
-                </div>
-
-                <div className='flex flex-row items-center justify-between gap-2'>
+                {/* Buttons */}
+                <div className="flex flex-col md:flex-row justify-between gap-4 mt-8">
                     <button
                         type="submit"
-                        className="w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg transition duration-300"
+                        className="w-full md:w-1/2 bg-btnAdd hover:bg-opacity-70 text-white font-semibold py-3 px-4 rounded-lg transition duration-300"
                     >
                         {isEdit ? 'Edit' : 'Submit'}
                     </button>
                     <button
                         type="button"
                         onClick={() => navigation(-1)}
-                        className="w-full bg-gray-100 hover:bg-gray-600 text-black hover:text-white font-semibold py-2 px-4 rounded-lg transition duration-300"
+                        className="w-full md:w-1/2 bg-gray-100 hover:bg-gray-600 text-black hover:text-white font-semibold py-3 px-4 rounded-lg transition duration-300"
                     >
                         Back
                     </button>
                 </div>
-
             </form>
         </div>
     );
+
 }
 
 export default DimandForm

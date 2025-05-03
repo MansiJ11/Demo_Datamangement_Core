@@ -11,7 +11,6 @@ const Home = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
 
-  const [data, setData] = useState([]);
   const [showData, setShowData] = useState([]);
   const [button, setButton] = useState([]);
   const [startDate, setStartDate] = useState('');
@@ -26,11 +25,12 @@ const Home = () => {
 
   useEffect(() => {
     getPaginationButtons();
-  },[totalItems, pageSize])
+  }, [totalItems, pageSize])
 
 
   const getPaginationButtons = () => {
     const totalPages = Math.ceil(totalItems / pageSize);
+    setTotalPrice(totalPages)
     const buttons = [];
 
     if (currentPage > 1) buttons.push('Prev');
@@ -76,8 +76,11 @@ const Home = () => {
   }, [currentPage, pageSize]);
 
 
-  const fetchList = async (page , size, download ) => {
+  const fetchList = async (page, size, download) => {
     setLoading(true);
+    if(!download){
+      setShowData([]);
+    }
     try {
       const response = await fetch(`https://diamond-core.onrender.com/api/Product/GetAll?page=${page}&size=${size}`);
       if (!response.ok) {
@@ -85,12 +88,11 @@ const Home = () => {
       }
       const data = await response.json();
       console.log("data:", data);
-      
 
-      if(download){
-        setData(data.data);
+
+      if (download) {
         return data.data; // Return data for download
-      } else{
+      } else {
         setShowData(data.data);
         setTotalItems(data.totalRecords); // Set total items from API response
         setTotalPrice(data.totalAmount); // Set total price from API response
@@ -153,7 +155,6 @@ const Home = () => {
 
       const data = await response.json();
       console.log("search data:", data);
-      setData(data); // Update table with searched data
       setShowData(data); // Update table with searched data
       setTotalItems(10)
     } catch (error) {
@@ -169,22 +170,22 @@ const Home = () => {
     const data = await fetchList(currentPage, totalItems, true); // Fetch data for PDF download
 
     const doc = new jsPDF();
-  
+
     const pageWidth = doc.internal.pageSize.getWidth();
-  
-    const title = "Dimand List";
+
+    const title = "Daimond List";
     const totalPriceText = `Total Price: ${totalPrice}`;
-  
+
     // Center the title
     doc.setFontSize(14);
     const titleWidth = doc.getTextWidth(title);
     doc.text(title, (pageWidth - titleWidth) / 2, 10); // Centered horizontally
-  
+
     // Total Price - right aligned on next row
     doc.setFontSize(12);
     const priceTextWidth = doc.getTextWidth(totalPriceText);
     doc.text(totalPriceText, pageWidth - priceTextWidth - 25, 18); // Right aligned
-  
+
     // Table
     const columns = [
       "SN.",
@@ -196,7 +197,7 @@ const Home = () => {
       "Start Date",
       "End Date"
     ];
-  
+
     const rows = data.map((item, index) => [
       index + 1,
       item.name,
@@ -207,24 +208,24 @@ const Home = () => {
       item.start_Date,
       item.end_Date
     ]);
-  
+
     autoTable(doc, {
       head: [columns],
       body: rows,
       startY: 28,
       styles: { fontSize: 8 },
     });
-  
-    doc.save('dimand-list.pdf');
+
+    doc.save('diamond-list.pdf');
   };
-  
+
 
   const handleDownloadExcel = async () => {
 
     const data = await fetchList(currentPage, totalItems, true); // Fetch data for PDF download
 
     const workbook = XLSX.utils.book_new();
-  
+
     // Create data rows
     const dataRows = data.map((item, index) => ({
       SN: index + 1,
@@ -236,120 +237,143 @@ const Home = () => {
       StartDate: item.start_Date,
       EndDate: item.end_Date
     }));
-  
+
     // Create worksheet from data
     const worksheet = XLSX.utils.json_to_sheet(dataRows, { origin: "A3" });
-  
+
     // Add title and total price manually
-    XLSX.utils.sheet_add_aoa(worksheet, [["Dimand List"]], { origin: "A1" });
+    XLSX.utils.sheet_add_aoa(worksheet, [["Diamond List"]], { origin: "A1" });
     XLSX.utils.sheet_add_aoa(worksheet, [[`Total Price: ${totalPrice}`]], { origin: "F2" }); // Adjust column F or G if needed
-  
+
     // Merge cells for title row (A1 to H1)
     if (!worksheet["!merges"]) worksheet["!merges"] = [];
     worksheet["!merges"].push({ s: { r: 0, c: 0 }, e: { r: 0, c: 7 } }); // Merge A1:H1
-  
-    XLSX.utils.book_append_sheet(workbook, worksheet, "Dimand");
-  
-    XLSX.writeFile(workbook, "dimand-list.xlsx");
-  };
-  
 
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Diamond");
+
+    XLSX.writeFile(workbook, "diamond-list.xlsx");
+  };
 
   return (
-    <div className='h-full flex flex-col items-center justify-center bg-gray-100 py-10'>
-      <h1 className='text-4xl font-bold mb-10'>Welcome to the Home Page</h1>
-      <Link to='/DimandForm' className='bg-btnAdd text-white px-4 py-2 rounded mb-4 w-2/3 text-center'>
-        Add New Product
-      </Link>
-      <div className='flex flex-row items-center justify-between mb-4 gap-2 w-2/3'>
-        <div className='flex flex-row items-center justify-between gap-5'>
-          <div className='flex flex-row items-center justify-center gap-2 mt-4'>
-            <label className='text-lg font-semibold'>Start Date :</label>
-            <input type="date" value={startDate} placeholder="Enter date" className='border border-gray-300 p-2 rounded' onChange={handleStartDateChange} />
-          </div>
-          <div className='flex flex-row items-center justify-center gap-2 mt-4'>
-            <label className='text-lg font-semibold'>End Date :</label>
-            <input type="date" value={endDate} placeholder="Enter date" className='border border-gray-300 p-2 rounded' onChange={handleEndDateChange} />
-          </div>
-        </div>
-        <div className='flex flex-row items-center justify-between gap-2'>
-          <div className='flex flex-row items-center justify-center gap-2 mt-4'>
-            <label className='text-lg font-semibold'>Name :</label>
-            <input type="text" value={name} placeholder="Enter name" className='border border-gray-300 p-2 rounded' onChange={handleNameChange} />
-          </div>
-          <button className='bg-btnAdd text-white px-4 py-2 rounded mt-4' onClick={handleSearch}>Search</button>
-        </div>
+    <div className="max-w-7xl mx-auto p-4">
+      <h1 className="text-3xl font-bold text-center mb-6 flex items-center justify-center gap-2">
+        <span role="img" aria-label="diamond">💎</span> Diamond List
+      </h1>
+      <div className="flex flex-col items-end mb-4">
+
+      
+      <button className="bg-white text-black rounded px-6 py-2 mb-4 hover:bg-gray-100 text-center shadow-xl" onClick={() => navigate('/DimandForm')}>
+        <span role="img" aria-label="add" className="text-white">➕</span>
+        Add New Diamond
+      </button>
+</div>
+
+      {/* Filter Section */}
+      <div className="bg-white shadow-lg rounded-lg p-4 mb-6 grid grid-cols-1 md:grid-cols-4 gap-4">
+
+        <input type="date" value={startDate} placeholder="Enter date" className="border rounded px-4 py-2 w-full" onChange={handleStartDateChange} />
+        <input
+          type="date"
+          value={endDate}
+          className="border rounded px-4 py-2 w-full"
+          placeholder="End Date"
+          onChange={handleEndDateChange}
+        />
+        <input
+          type="text"
+          value={name}
+          onChange={handleNameChange}
+          className="border rounded px-4 py-2 w-full"
+          placeholder="Name"
+        />
+        <button className="bg-white text-black rounded px-4 py-2 w-full shadow-lg hover:bg-gray-100" onClick={handleSearch}>
+          <span role="img" aria-label="search">🔍</span>
+          Search
+        </button>
       </div>
-      <div className="overflow-x-auto w-2/3 ">
-        <table className="table-auto w-full border-collapse border border-gray-300">
-          <thead>
-            <tr className='bg-[#adb5bd]'>
-              <th className="border border-gray-300 p-2">SN.</th>
-              <th className="border border-gray-300 p-2">name</th>
-              <th className="border border-gray-300 p-2">packageNo</th>
-              <th className="border border-gray-300 p-2">Crt</th>
-              <th className="border border-gray-300 p-2">product_Price</th>
-              <th className="border border-gray-300 p-2">totalPrice</th>
-              <th className="border border-gray-300 p-2">start_Date</th>
-              <th className="border border-gray-300 p-2">end_Date</th>
-              <th className="border border-gray-300 p-2">Action</th>
+      
+
+      {/* Table Section */}
+      <div className="overflow-x-auto bg-white shadow-lg rounded-lg">
+        <table className="min-w-full text-sm text-left">
+          <thead className="bg-gray-100">
+            <tr>
+              <th className="px-4 py-3">SN</th>
+              <th className="px-4 py-3">Name</th>
+              <th className="px-4 py-3">Package No</th>
+              <th className="px-4 py-3">Ct</th>
+              <th className="px-4 py-3">Product Price</th>
+              <th className="px-4 py-3">Total Price</th>
+              <th className="px-4 py-3">Start Date</th>
+              <th className="px-4 py-3">End Date</th>
+              <th className="px-4 py-3">Action</th>
             </tr>
           </thead>
-
           <tbody>
-
             {
-              !loading && data.length === 0 && <tr><td colSpan="9" className="text-center p-4">No data found</td></tr>
+              !loading && showData.length === 0 && <tr><td colSpan="9" className="text-center p-4">No data found</td></tr>
             }
-            {
-              showData && showData.map((item, index) => (
-                <tr key={index}>
-                  <td className="border border-gray-300 p-2">{index + 1}</td>
-                  <td className="border border-gray-300 p-2">{item.name}</td>
-                  <td className="border border-gray-300 p-2">{item.packageNo}</td>
-                  <td className="border border-gray-300 p-2">{item.grams}</td>
-                  <td className="border border-gray-300 p-2">{item.product_Price}</td>
-                  <td className="border border-gray-300 p-2">{item.totalPrice}</td>
-                  <td className="border border-gray-300 p-2">{item.start_Date}</td>
-                  <td className="border border-gray-300 p-2">{item.end_Date}</td>
-                  <td className="border border-gray-300 p-2">
-                    <button className='bg-btnAdd text-white px-4 py-2 rounded'
-                      onClick={() => navigate('/DimandForm', { state: { data: item } })}>Edit</button>
-                    <button className='bg-delete text-white px-4 py-2 rounded ml-2' onClick={() => handleDelete(item.id)}>Delete</button>
-                  </td>
-                </tr>
-              ))
-            }
-
+            {showData && showData.map((item, idx) => (
+              <tr key={idx} className="border-t hover:bg-gray-50">
+                <td className="px-4 py-2">{Number((currentPage -1) * 10)+Number(idx + 1)}</td>
+                <td className="px-4 py-2">{item.name}</td>
+                <td className="px-4 py-2">{item.packageNo}</td>
+                <td className="px-4 py-2">{item.grams}</td>
+                <td className="px-4 py-2">{item.product_Price}</td>
+                <td className="px-4 py-2">{item.totalPrice}</td>
+                <td className="px-4 py-2">{item.start_Date}</td>
+                <td className="px-4 py-2">{item.end_Date}</td>
+                <td className="px-4 py-2 space-x-2">
+                  <button className="bg-btnAdd text-white px-3 py-1 rounded hover:bg-blue-600" onClick={() => navigate('/DimandForm', { state: { data: item } })}>
+                    Edit
+                  </button>
+                  <button className="bg-delete text-white px-3 py-1 rounded hover:bg-red-600" onClick={() => handleDelete(item.id)}>
+                    Delete
+                  </button>
+                </td>
+              </tr>
+            ))}
           </tbody>
-
         </table>
 
-        <div className="flex gap-2 mt-6 items-center flex-wrap">
-          {button.map((btn, i) => (
-            <button
-              key={i}
-              className={`px-3 py-1 rounded ${btn === currentPage
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-gray-300 hover:bg-gray-400'
-                }`}
-              onClick={() => handlePageChange(btn)}
-              disabled={btn === '...' || btn === currentPage}
-            >
-              {btn}
-            </button>
-          ))}
-        </div>
-        {loading && <div className="flex items-center justify-center h-full my-5">
-          <Spinner />
-        </div>}
+        {loading && (
+          <div className="flex items-center justify-center h-full my-5">
+            <Spinner />
+          </div>
+        )}
       </div>
-      <div className='flex flex-row justify-between gap-5'>
-        <button className='bg-btnAdd text-white px-4 py-2 rounded mt-4' onClick={handleDownloadPDF}>Download PDF</button>
-        <button className='bg-btnAdd text-white px-4 py-2 rounded mt-4' onClick={handleDownloadExcel}>Download Excel</button>
+      <div className="flex flex-wrap justify-center gap-2 mt-6">
+        {button.map((btn, i) => (
+          <button
+            key={i}
+            className={`px-3 py-1 rounded text-sm font-medium ${btn === currentPage
+                ? 'bg-btnAdd text-white'
+                : 'bg-gray-300 hover:bg-gray-400'
+              }`}
+            onClick={() => handlePageChange(btn)}
+            disabled={btn === '...' || btn === currentPage}
+          >
+            {btn}
+          </button>
+        ))}
+      </div>
+      <div className="flex flex-col sm:flex-row gap-4 mt-6">
+        <button
+          className="bg-btnAdd text-white px-4 py-2 rounded text-sm w-full sm:w-auto"
+          onClick={handleDownloadPDF}
+        >
+          Download PDF
+        </button>
+        <button
+          className="bg-btnAdd text-white px-4 py-2 rounded text-sm w-full sm:w-auto"
+          onClick={handleDownloadExcel}
+        >
+          Download Excel
+        </button>
       </div>
     </div>
-  )
+  );
+
 }
 
 export default Home
