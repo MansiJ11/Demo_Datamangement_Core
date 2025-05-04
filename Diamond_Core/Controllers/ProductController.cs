@@ -130,6 +130,40 @@ namespace Diamond_Core.Controllers
         }
 
 
+        [HttpGet("GetProducts")]
+        public IActionResult GetProducts(
+    string? startDate = null,
+    string? endDate = null,
+    string? name = null,
+    int page = 1,
+    int size = 10)
+        {
+            bool isFilterApplied = !string.IsNullOrWhiteSpace(startDate)
+                                || !string.IsNullOrWhiteSpace(endDate)
+                                || !string.IsNullOrWhiteSpace(name);
 
+            ProductSearchResult result = _productHelper.GetSearchProducts(
+                startDate, endDate, name, page, size, ignorePagination: false);
+
+            int totalRecords = result.Products.Count;
+            int totalPages = (int)Math.Ceiling((double)totalRecords / size);
+
+            return Ok(new
+            {
+                TotalRecords = totalRecords,
+                Page = page,
+                PageSize = size,
+                TotalPages = totalPages,
+                TotalAmount = result.TotalAmount,
+                Data = result.Products
+            });
         }
+
+
+
+    }
+
+
+
+
 }

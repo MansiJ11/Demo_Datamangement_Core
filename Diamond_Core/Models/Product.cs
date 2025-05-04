@@ -58,6 +58,7 @@ namespace RadheDaimond.Models
     {
         public List<Product> Products { get; set; }
         public string TotalAmount { get; set; }
+        public int TotalRecords { get; set; }
     }
 
 }

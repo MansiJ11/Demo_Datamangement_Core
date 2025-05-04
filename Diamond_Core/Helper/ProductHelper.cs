@@ -422,5 +422,90 @@ namespace RadheDaimond.Helper
             return dummyPdfContent;
         }
 
+
+        public ProductSearchResult GetSearchProducts(string startDate, string endDate, string name, int pageNumber, int pageSize, bool ignorePagination = false)
+        {
+            List<Product> products = new List<Product>();
+            decimal totalAmount = 0;
+            int totalRecords = 0;
+
+            using (MySqlConnection conn = new MySqlConnection(connStr))
+            {
+                conn.Open();
+
+                // Build WHERE conditions
+                List<string> conditions = new List<string>();
+                if (!string.IsNullOrWhiteSpace(startDate)) conditions.Add("Start_Date >= @StartDate");
+                if (!string.IsNullOrWhiteSpace(endDate)) conditions.Add("End_Date <= @EndDate");
+                if (!string.IsNullOrWhiteSpace(name)) conditions.Add("Name LIKE @Name");
+
+                string whereClause = conditions.Any() ? "WHERE " + string.Join(" AND ", conditions) : "";
+
+                // Get total count
+                string countQuery = $"SELECT COUNT(*) FROM product {whereClause}";
+                using (MySqlCommand countCmd = new MySqlCommand(countQuery, conn))
+                {
+                    if (!string.IsNullOrWhiteSpace(startDate)) countCmd.Parameters.AddWithValue("@StartDate", startDate);
+                    if (!string.IsNullOrWhiteSpace(endDate)) countCmd.Parameters.AddWithValue("@EndDate", endDate);
+                    if (!string.IsNullOrWhiteSpace(name)) countCmd.Parameters.AddWithValue("@Name", "%" + name + "%");
+
+                    totalRecords = Convert.ToInt32(countCmd.ExecuteScalar());
+                }
+
+                // Fetch paginated data
+                int offset = (pageNumber - 1) * pageSize;
+                string query = $"SELECT * FROM product {whereClause} ORDER BY Id";
+
+                if (!ignorePagination)
+                    query += " LIMIT @PageSize OFFSET @Offset";
+
+                using (MySqlCommand cmd = new MySqlCommand(query, conn))
+                {
+                    if (!string.IsNullOrWhiteSpace(startDate)) cmd.Parameters.AddWithValue("@StartDate", startDate);
+                    if (!string.IsNullOrWhiteSpace(endDate)) cmd.Parameters.AddWithValue("@EndDate", endDate);
+                    if (!string.IsNullOrWhiteSpace(name)) cmd.Parameters.AddWithValue("@Name", "%" + name + "%");
+
+                    if (!ignorePagination)
+                    {
+                        cmd.Parameters.AddWithValue("@PageSize", pageSize);
+                        cmd.Parameters.AddWithValue("@Offset", offset);
+                    }
+
+                    using (MySqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            string gramsStr = reader["Grams"]?.ToString();
+                            string priceStr = reader["Product_Price"]?.ToString();
+                            string totalPrice = CalculateTotalPrice(gramsStr, priceStr);
+
+                            if (decimal.TryParse(totalPrice, out var tp))
+                                totalAmount += tp;
+
+                            products.Add(new Product
+                            {
+                                Id = reader.GetInt32("Id"),
+                                Name = reader.GetString("Name"),
+                                PackageNo = reader.GetString("PackageNo"),
+                                Grams = gramsStr,
+                                Start_Date = reader.GetString("Start_Date"),
+                                End_Date = reader["End_Date"]?.ToString(),
+                                Product_Price = priceStr,
+                                TotalPrice = totalPrice
+                            });
+                        }
+                    }
+                }
+            }
+
+            return new ProductSearchResult
+            {
+                Products = products,
+                TotalAmount = totalAmount.ToString("0.00"),
+                TotalRecords = totalRecords
+            };
+        }
+
+
     }
 }
