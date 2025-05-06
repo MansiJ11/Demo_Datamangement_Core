@@ -16,6 +16,7 @@ const Home = () => {
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
   const [name, setName] = useState('');
+  const [status, setStatus] = useState(0);
   const [isSearch, setIsSearch] = useState(false);
 
   const [currentPage, setCurrentPage] = useState(1);
@@ -277,8 +278,11 @@ const Home = () => {
       <h1 className="text-3xl font-bold text-center mb-6 flex items-center justify-center gap-2">
         <span role="img" aria-label="diamond">💎</span> Radhe Diamond
       </h1>
-      <div className="flex flex-col items-end mb-4">
-
+      <div className="flex flex-row  items-center justify-between mb-4">
+        <button className="bg-white text-black rounded px-6 py-2 mb-4 hover:bg-gray-100 text-center shadow-xl" onClick={() => navigate('/Addclient')}>
+          <span role="img" aria-label="add" className="text-white">➕</span>
+          Add New Client
+        </button>
 
         <button className="bg-white text-black rounded px-6 py-2 mb-4 hover:bg-gray-100 text-center shadow-xl" onClick={() => navigate('/DimandForm')}>
           <span role="img" aria-label="add" className="text-white">➕</span>
@@ -287,16 +291,16 @@ const Home = () => {
       </div>
 
       {/* Filter Section */}
-      <div className="bg-white shadow-lg rounded-lg p-4 mb-6 grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div className="bg-white shadow-lg rounded-lg p-4 mb-6 grid grid-cols-1 md:grid-cols-6 gap-4">
 
-        <input 
-          type={startType} 
-          value={startDate} 
+        <input
+          type={startType}
+          value={startDate}
           onFocus={() => setStartType("date")}
           onBlur={() => startDate === "" && setStartType("text")}
-          placeholder="Issue Date" 
+          placeholder="Issue Date"
           className="border rounded px-4 py-2 w-full"
-           onChange={handleStartDateChange} 
+          onChange={handleStartDateChange}
         />
         <input
           type={endType}
@@ -314,9 +318,33 @@ const Home = () => {
           className="border rounded px-4 py-2 w-full"
           placeholder="Name"
         />
+        <select
+          value={status}
+          onChange={e => setStatus(e.target.value)}
+          className="border rounded px-4 py-2 w-full"
+        >
+          <option value="all">All</option>
+          <option value="pending">Pending</option>
+          <option value="complete">Complete</option>
+        </select>
         <button className="bg-white text-black rounded px-4 py-2 w-full shadow-lg hover:bg-gray-100" onClick={handleSearch}>
           <span role="img" aria-label="search">🔍</span>
           Search
+        </button>
+        <button
+          className="bg-red-500 text-white rounded px-4 py-2 w-full shadow-lg hover:bg-red-600"
+          onClick={() => { 
+            setName(''); 
+            setStartDate(''); 
+            setEndDate(''); 
+            setStatus(0); 
+            setIsSearch(false); 
+            setCurrentPage(1); 
+            setPageSize(10); 
+            fetchList(1, pageSize, false); 
+          }}
+        >
+          Reset
         </button>
       </div>
 
@@ -355,7 +383,7 @@ const Home = () => {
                   <button className="bg-btnAdd text-white px-3 py-1 rounded hover:bg-blue-600" onClick={() => navigate('/DimandForm', { state: { data: item } })}>
                     Edit
                   </button>
-                  <button className="bg-delete text-white px-3 py-1 rounded hover:bg-red-600" onClick={() =>{ setCurrentPage(1); handleDelete(item.id)}}>
+                  <button className="bg-delete text-white px-3 py-1 rounded hover:bg-red-600" onClick={() => { setCurrentPage(1); handleDelete(item.id) }}>
                     Delete
                   </button>
                 </td>
