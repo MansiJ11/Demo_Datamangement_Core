@@ -75,27 +75,27 @@ namespace Diamond_Core.Controllers
             return isDeleted ? Ok("Product Deleted successfully.") : StatusCode(500);
         }
 
-        [HttpGet("SearchByName")]
-        public IActionResult SearchByName(string name)
-        {
-            if (string.IsNullOrWhiteSpace(name))
-                return BadRequest("Name parameter is required.");
+        //[HttpGet("SearchByName")]
+        //public IActionResult SearchByName(string name)
+        //{
+        //    if (string.IsNullOrWhiteSpace(name))
+        //        return BadRequest("Name parameter is required.");
 
-            var result = _productHelper.SearchProductsByName(name);
+        //    var result = _productHelper.SearchProductsByName(name);
 
-            return result.Any() ? Ok(result) : NotFound();
-        }
+        //    return result.Any() ? Ok(result) : NotFound();
+        //}
 
-        [HttpGet("SearchByDate")]
-        public IActionResult SearchByDate(string startDate, string endDate)
-        {
-            if (string.IsNullOrWhiteSpace(startDate) || string.IsNullOrWhiteSpace(endDate))
-                return BadRequest("Start date and end date are required.");
+        //[HttpGet("SearchByDate")]
+        //public IActionResult SearchByDate(string startDate, string endDate)
+        //{
+        //    if (string.IsNullOrWhiteSpace(startDate) || string.IsNullOrWhiteSpace(endDate))
+        //        return BadRequest("Start date and end date are required.");
 
-            var result = _productHelper.SearchProductsByDateRange(startDate, endDate);
+        //    var result = _productHelper.SearchProductsByDateRange(startDate, endDate);
 
-            return result.Any() ? Ok(result) : NotFound();
-        }
+        //    return result.Any() ? Ok(result) : NotFound();
+        //}
 
         [HttpGet("Search")]
         public IActionResult Search(string? startDate = null,string? endDate = null,string? name = null,int pageNumber = 1,int pageSize = 10)

@@ -523,12 +523,12 @@ namespace RadheDaimond.Helper
             using (MySqlConnection conn = new MySqlConnection(connStr))
             {
                 conn.Open();
-                string query = @"INSERT INTO client (Name) 
-                         VALUES (@Name)";
+                string query = @"INSERT INTO client (ClientName) 
+                         VALUES (@ClientName)";
 
                 using (MySqlCommand cmd = new MySqlCommand(query, conn))
                 {
-                    cmd.Parameters.AddWithValue("@Name", value.ClientName);
+                    cmd.Parameters.AddWithValue("@ClientName", value.ClientName);
 
                     return cmd.ExecuteNonQuery() > 0;
                 }
