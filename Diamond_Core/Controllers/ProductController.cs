@@ -132,20 +132,17 @@ namespace Diamond_Core.Controllers
 
         [HttpGet("GetProducts")]
         public IActionResult GetProducts(
-    string? startDate = null,
-    string? endDate = null,
-    string? name = null,
-    int page = 1,
-    int size = 10)
+     string? startDate = null,
+     string? endDate = null,
+     string? name = null,
+     int? status = null,  // Nullable status: 0 = all, 1 = pending, 2 = completed, null = all data
+     int page = 1,
+     int size = 10)
         {
-            bool isFilterApplied = !string.IsNullOrWhiteSpace(startDate)
-                                || !string.IsNullOrWhiteSpace(endDate)
-                                || !string.IsNullOrWhiteSpace(name);
-
             ProductSearchResult result = _productHelper.GetSearchProducts(
-                startDate, endDate, name, page, size, ignorePagination: false);
+                startDate, endDate, name, status, page, size, ignorePagination: false);
 
-            int totalRecords = result.Products.Count;
+            int totalRecords = result.TotalRecords;
             int totalPages = (int)Math.Ceiling((double)totalRecords / size);
 
             return Ok(new
@@ -158,6 +155,18 @@ namespace Diamond_Core.Controllers
                 Data = result.Products
             });
         }
+
+        [HttpPost("AddClient")]
+        public IActionResult AddClient([FromBody] AddClient value)
+        {
+            if (value == null)
+                return BadRequest("please add client name.");
+
+            bool isInserted = _productHelper.InsertClient(value);
+
+            return isInserted ? Ok("Product inserted successfully.") : StatusCode(500);
+        }
+
 
 
 

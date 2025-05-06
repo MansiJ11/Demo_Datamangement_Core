@@ -32,15 +32,15 @@ namespace RadheDaimond.Models
 
         [Required]
         public string Start_Date { get; set; }
+        public string Product_Price { get; set; }
+        public string Pics { get; set; }
+        public string Weight { get; set; }
+
     }
 
     public class EditProductRequest
     {
-        [Required]
-        public string End_Date { get; set; }
-
-        [Required]
-        public string Product_Price { get; set; }
+        public int? IsComplete { get; set; }
 
 
     }
@@ -59,6 +59,11 @@ namespace RadheDaimond.Models
         public List<Product> Products { get; set; }
         public string TotalAmount { get; set; }
         public int TotalRecords { get; set; }
+    }
+
+    public class AddClient
+    {
+        public string ClientName { get; set; }
     }
 
 }

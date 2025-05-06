@@ -132,8 +132,8 @@ namespace RadheDaimond.Helper
             using (MySqlConnection conn = new MySqlConnection(connStr))
             {
                 conn.Open();
-                string query = @"INSERT INTO product (Name, PackageNo, Grams, Start_Date) 
-                         VALUES (@Name, @PackageNo, @Grams, @Start_Date)";
+                string query = @"INSERT INTO product (Name, PackageNo, Grams, Start_Date,Product_Price,Pics,Weight) 
+                         VALUES (@Name, @PackageNo, @Grams, @Start_Date,@Product_Price,@Pics,@Weight)";
 
                 using (MySqlCommand cmd = new MySqlCommand(query, conn))
                 {
@@ -141,6 +141,9 @@ namespace RadheDaimond.Helper
                     cmd.Parameters.AddWithValue("@PackageNo", product.PackageNo);
                     cmd.Parameters.AddWithValue("@Grams", product.Grams);
                     cmd.Parameters.AddWithValue("@Start_Date", product.Start_Date);
+                    cmd.Parameters.AddWithValue("@Product_Price", product.Product_Price);
+                    cmd.Parameters.AddWithValue("@Pics", product.Pics);
+                    cmd.Parameters.AddWithValue("@Weight", product.Weight);
 
                     return cmd.ExecuteNonQuery() > 0;
                 }
@@ -153,15 +156,15 @@ namespace RadheDaimond.Helper
             using (MySqlConnection conn = new MySqlConnection(connStr))
             {
                 conn.Open();
+
+                string? endDateValue = product.IsComplete == 1 ? DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"): null;
+
                 string query = @"UPDATE product 
-                         SET End_Date = @End_Date, 
-                             Product_Price = @Product_Price 
-                         WHERE Id = @Id";
+                         SET End_Date = @End_Date WHERE Id = @Id";
 
                 using (MySqlCommand cmd = new MySqlCommand(query, conn))
                 {
-                    cmd.Parameters.AddWithValue("@End_Date", product.End_Date);
-                    cmd.Parameters.AddWithValue("@Product_Price", product.Product_Price);
+                    cmd.Parameters.AddWithValue("@End_Date", (object?)endDateValue ?? DBNull.Value);
                     cmd.Parameters.AddWithValue("@Id", id);
 
                     int rows = cmd.ExecuteNonQuery();
@@ -423,7 +426,7 @@ namespace RadheDaimond.Helper
         }
 
 
-        public ProductSearchResult GetSearchProducts(string startDate, string endDate, string name, int pageNumber, int pageSize, bool ignorePagination = false)
+        public ProductSearchResult GetSearchProducts(string startDate, string endDate, string name, int? status, int pageNumber, int pageSize, bool ignorePagination = false)
         {
             List<Product> products = new List<Product>();
             decimal totalAmount = 0;
@@ -438,6 +441,11 @@ namespace RadheDaimond.Helper
                 if (!string.IsNullOrWhiteSpace(startDate)) conditions.Add("Start_Date >= @StartDate");
                 if (!string.IsNullOrWhiteSpace(endDate)) conditions.Add("End_Date <= @EndDate");
                 if (!string.IsNullOrWhiteSpace(name)) conditions.Add("Name LIKE @Name");
+
+                if (status == 1)
+                    conditions.Add("End_Date IS NULL"); // Pending
+                else if (status == 2)
+                    conditions.Add("End_Date IS NOT NULL"); // Completed
 
                 string whereClause = conditions.Any() ? "WHERE " + string.Join(" AND ", conditions) : "";
 
@@ -482,6 +490,9 @@ namespace RadheDaimond.Helper
                             if (decimal.TryParse(totalPrice, out var tp))
                                 totalAmount += tp;
 
+                            string endDateValue = reader["End_Date"]?.ToString();
+                            string statusStr = string.IsNullOrEmpty(endDateValue) ? "Pending" : "Completed";
+
                             products.Add(new Product
                             {
                                 Id = reader.GetInt32("Id"),
@@ -489,7 +500,7 @@ namespace RadheDaimond.Helper
                                 PackageNo = reader.GetString("PackageNo"),
                                 Grams = gramsStr,
                                 Start_Date = reader.GetString("Start_Date"),
-                                End_Date = reader["End_Date"]?.ToString(),
+                                End_Date = endDateValue,
                                 Product_Price = priceStr,
                                 TotalPrice = totalPrice
                             });
@@ -505,6 +516,25 @@ namespace RadheDaimond.Helper
                 TotalRecords = totalRecords
             };
         }
+
+
+        public bool InsertClient(AddClient value)
+        {
+            using (MySqlConnection conn = new MySqlConnection(connStr))
+            {
+                conn.Open();
+                string query = @"INSERT INTO client (Name) 
+                         VALUES (@Name)";
+
+                using (MySqlCommand cmd = new MySqlCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("@Name", value.ClientName);
+
+                    return cmd.ExecuteNonQuery() > 0;
+                }
+            }
+        }
+
 
 
     }
