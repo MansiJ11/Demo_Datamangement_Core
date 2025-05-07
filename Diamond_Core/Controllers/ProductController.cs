@@ -168,6 +168,14 @@ namespace Diamond_Core.Controllers
         }
 
 
+        [HttpGet("GetAllClientNames")]
+        public IActionResult GetAllClientNames()
+        {
+            List<string> names = _productHelper.GetAllClientNames();
+            return Ok(names);
+        }
+
+
 
 
     }

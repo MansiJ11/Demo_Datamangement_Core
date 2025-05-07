@@ -535,6 +535,29 @@ namespace RadheDaimond.Helper
             }
         }
 
+        public List<string> GetAllClientNames()
+        {
+            List<string> clientNames = new List<string>();
+
+            using (MySqlConnection conn = new MySqlConnection(connStr))
+            {
+                conn.Open();
+                string query = "SELECT * FROM client";
+
+                using (MySqlCommand cmd = new MySqlCommand(query, conn))
+                using (MySqlDataReader reader = cmd.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        clientNames.Add(reader.GetString("ClientName"));
+                    }
+                }
+            }
+
+            return clientNames;
+        }
+
+
 
 
     }
