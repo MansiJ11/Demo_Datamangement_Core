@@ -1,40 +1,26 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
+
 const DimandForm = () => {
 
     const navigation = useNavigate();
     const { state } = useLocation();
 
-    const [formData, setFormData] = useState({
-        name: '',
-        packageNo: '',
-        grams: '',
-        product_Price: '',
-        end_Date: '',
-        start_Date: ''
-    });
+    const clientNames = state?.clientNames;
 
-    const [error, setError] = useState(null);
-    const [success, setSuccess] = useState(null);
-    const [loading, setLoading] = useState(false);
-    const [isEdit, setIsEdit] = useState(false);
-    const [id, setId] = useState(null);
+    console.log("clientNames:", clientNames)
 
-    useEffect(() => {
-        if (state && state.data) {
-            console.log("state:", state);
-            setFormData({
-                name: state.data.name,
-                packageNo: state.data.packageNo,
-                grams: state.data.grams,
-                product_Price: state.data.product_Price,
-                end_Date: state.data.end_Date,
-                start_Date: state.data.start_Date
-            });
-            setId(state.data.id)
-            setIsEdit(true);
-        }
-    }, []);
+
+    const handleSuggestionClick = (name) => {
+        console.log("name:", name)
+        setFormData(prev => ({ ...prev, name }));
+        setShow(false)
+
+        const suggestions = (clientNames || []).filter(client =>
+            client.toLowerCase().includes(name.toLowerCase())
+        );
+        setFilteredSuggestions(suggestions);
+    };
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -42,7 +28,61 @@ const DimandForm = () => {
             ...prev,
             [name]: value
         }));
+
+        const suggestions = (clientNames || []).filter(client =>
+            client.toLowerCase().includes(value.toLowerCase())
+        );
+        setFilteredSuggestions(suggestions);
     };
+
+
+
+    const [formData, setFormData] = useState({
+        name: '',
+        packageNo: '',
+        grams: '',
+        product_Price: '',
+        end_Date: '',
+        start_Date: '',
+        pics: '',
+        weight: ''
+    });
+
+    const [filteredSuggestions, setFilteredSuggestions] = useState(clientNames ? clientNames : []);
+
+    clientNames
+    const [error, setError] = useState(null);
+    const [success, setSuccess] = useState(null);
+    const [loading, setLoading] = useState(false);
+    const [isEdit, setIsEdit] = useState(false);
+    const [show, setShow] = useState(false);
+    const [checked, setChecked] = useState(0);
+    const [id, setId] = useState(null);
+
+    useEffect(() => {
+        if (state && state.data) {
+            setFormData({
+                name: state.data.name,
+                packageNo: state.data.packageNo,
+                grams: state.data.grams,
+                product_Price: state.data.product_Price,
+                end_Date: state.data.end_Date,
+                start_Date: state.data.start_Date,
+                pics: state.data.pics || '',
+                weight: state.data.weight || ''
+            });
+            setId(state.data.id)
+            setIsEdit(true);
+        }
+    }, []);
+
+    // const handleChange = (e) => {
+    //     const { name, value } = e.target;
+    //     setFormData(prev => ({
+    //         ...prev,
+    //         [name]: value
+    //     }));
+    // };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -53,17 +93,17 @@ const DimandForm = () => {
 
         e.preventDefault();
 
-        const { name, packageNo, grams, product_Price, start_Date, end_Date } = formData;
+        const { name, packageNo, grams, product_Price, start_Date, end_Date, pics, weight } = formData;
 
         // Basic validation
-        if (!name || !packageNo || !grams || !start_Date) {
+        if (!name || !packageNo || !grams || !start_Date || !product_Price || !pics || !weight) {
             setError('Please fill in all fields.');
             setLoading(false);
             return;
         }
 
-        if (Number(grams) <= 0 ) {
-            setError('Grams and Product Price must be positive numbers.');
+        if (Number(grams) <= 0 || Number(product_Price) <= 0 || Number(pics) <= 0 || Number(weight) <= 0) {
+            setError('Grams, pics, weight and Product Price must be positive numbers.');
             setLoading(false);
             return;
         }
@@ -84,8 +124,7 @@ const DimandForm = () => {
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
-                        Product_Price: formData.product_Price,
-                        End_Date: formData.end_Date
+                        IsComplete: checked
                     })
                 });
 
@@ -116,7 +155,9 @@ const DimandForm = () => {
                         Grams: grams,
                         Product_Price: product_Price,
                         Start_Date: start_Date,
-                        End_Date: end_Date
+                        End_Date: end_Date,
+                        Pics: pics,
+                        Weight: weight,
                     })
                 });
 
@@ -195,7 +236,23 @@ const DimandForm = () => {
                             placeholder="Enter name"
                             required
                             disabled={isEdit}
+                            onFocus={() => setShow(true)}
+                        // onBlur={() => setTimeout(() => setShow(false), 100)}
+
                         />
+                        {!isEdit && filteredSuggestions.length > 0 && show && (
+                            <ul className="absolute z-10 w-full bg-white border border-gray-300 rounded mt-1 shadow-lg max-h-40 overflow-auto">
+                                {filteredSuggestions.map((client, index) => (
+                                    <li
+                                        key={index}
+                                        onClick={() => handleSuggestionClick(client)}
+                                        className="px-4 py-2 hover:bg-blue-100 cursor-pointer"
+                                    >
+                                        {client}
+                                    </li>
+                                ))}
+                            </ul>
+                        )}
                     </div>
 
                     {/* Package No */}
@@ -231,7 +288,7 @@ const DimandForm = () => {
                     </div>
 
                     {/* Product Price */}
-                    {isEdit && <div>
+                    <div>
                         <label className="block text-gray-600 mb-2" htmlFor="product_Price">Product Price</label>
                         <input
                             type="number"
@@ -242,8 +299,41 @@ const DimandForm = () => {
                             onChange={handleChange}
                             className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
                             required
+                            disabled={isEdit}
                         />
-                    </div>}
+                    </div>
+
+                    {/* Pics */}
+                    <div>
+                        <label className="block text-gray-600 mb-2" htmlFor="pics">Pics</label>
+                        <input
+                            type="number"
+                            name="pics"
+                            id="pics"
+                            value={formData.pics}
+                            placeholder="Pics"
+                            onChange={handleChange}
+                            className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+                            required
+                            disabled={isEdit}
+                        />
+                    </div>
+
+                    {/* Weight */}
+                    <div>
+                        <label className="block text-gray-600 mb-2" htmlFor="weight">Weight</label>
+                        <input
+                            type="number"
+                            name="weight"
+                            id="weight"
+                            value={formData.weight}
+                            placeholder="Weight"
+                            onChange={handleChange}
+                            className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+                            required
+                            disabled={isEdit}
+                        />
+                    </div>
 
                     {/* Start Date */}
                     <div>
@@ -261,7 +351,7 @@ const DimandForm = () => {
                     </div>
 
                     {/* End Date */}
-                    {isEdit && <div>
+                    {isEdit && formData.end_Date && <div>
                         <label className="block text-gray-600 mb-2" htmlFor="end_Date">Return date</label>
                         <input
                             type="date"
@@ -272,6 +362,23 @@ const DimandForm = () => {
                             className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
                         />
                     </div>}
+
+                    {isEdit && !formData.end_Date && <div>
+                        <label className="block text-gray-600 mb-2" htmlFor="end_Date">Return date</label>
+                        <input
+                            type="checkbox"
+                            name="Return date"
+                            id="Return date"
+                            checked={checked === 1}
+                            onChange={(e) =>{
+                                console.log("abb",e.target.checked)
+                                let status = e.target.checked ? 1 : 0;
+                                setChecked(status)
+                            }}
+                            className="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                        />
+                    </div>}
+
                 </div>
 
                 {/* Buttons */}

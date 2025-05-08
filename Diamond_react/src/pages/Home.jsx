@@ -10,6 +10,7 @@ const Home = () => {
 
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   const [showData, setShowData] = useState([]);
   const [button, setButton] = useState([]);
@@ -24,6 +25,8 @@ const Home = () => {
   const [totalItems, setTotalItems] = useState(0); // Set from API
   const [totalPages, setTotalPages] = useState(0); // Set from API
   const [totalPrice, setTotalPrice] = useState(0); // Set from API
+
+  const [clientNames, setClientNames] = useState([]);
 
   const [startType, setStartType] = useState("text");
   const [endType, setEndType] = useState("text");
@@ -80,14 +83,39 @@ const Home = () => {
     fetchList(currentPage, pageSize, false);
   }, [currentPage, pageSize]);
 
+  useEffect(() => {
+    setError(null);
+    fetch('https://diamond-core.onrender.com/api/Product/GetAllClientNames')
+      .then((response) => {
+        return response.json();
+      }).then((data) => {
+        console.log("client names:", data);
+        setClientNames(data);
+        setLoading(false);
+      })
+      .catch((err) => {
+        setError('Failed to fetch client names');
+        setLoading(false);
+      });
+  }, []);
+
 
   const fetchList = async (page, size, download) => {
+    setError(null);
     setLoading(true);
     if (!download) {
       setShowData([]);
     }
+    const params = new URLSearchParams({
+      startDate,
+      endDate,
+      name,
+      status,
+      page,
+      size,
+    });
     try {
-      const response = await fetch(`https://diamond-core.onrender.com/api/Product/GetAll?page=${page}&size=${size}`);
+      const response = await fetch(`https://diamond-core.onrender.com/api/Product/GetProducts?${params}`);
       if (!response.ok) {
         throw new Error('Network response was not ok ' + response.statusText);
       }
@@ -141,49 +169,14 @@ const Home = () => {
     }
   };
 
-  const handleSearch = async () => {
-    try {
-
-      setLoading(true);
-      // Construct search URL with query params
-      const queryParams = new URLSearchParams({
-        startDate,
-        endDate,
-        name,
-      }).toString();
-
-      const response = await fetch(`https://diamond-core.onrender.com/api/Product/Search?${queryParams}`);
-
-      if (!response.ok) {
-        throw new Error('Network response was not ok ' + response.statusText);
-      }
-
-      const data = await response.json();
-      console.log("search data:", data);
-
-      setShowData(data.products); // Update table with searched data
-      setIsSearch(true)
-      setTotalItems(10)
-      setTotalPrice(data.totalAmount); // Set total price from API response
-
-      return data.products
-    } catch (error) {
-      console.error('Error fetching search results:', error);
-      alert('Error searching products');
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleDownloadPDF = async () => {
 
     let data = [] // Fetch data for PDF download
 
-    if (isSearch) {
-      data = await handleSearch()
-    } else {
+  
       data = await fetchList(currentPage, totalItems, true); // Fetch data for PDF download
-    }
+    
 
     const doc = new jsPDF();
 
@@ -238,11 +231,8 @@ const Home = () => {
 
     let data = [] // Fetch data for PDF download
 
-    if (isSearch) {
-      data = await handleSearch()
-    } else {
       data = await fetchList(currentPage, totalItems, true); // Fetch data for PDF download
-    }
+    
 
     const workbook = XLSX.utils.book_new();
 
@@ -284,7 +274,7 @@ const Home = () => {
           Add New Client
         </button>
 
-        <button className="bg-white text-black rounded px-6 py-2 mb-4 hover:bg-gray-100 text-center shadow-xl" onClick={() => navigate('/DimandForm')}>
+        <button className="bg-white text-black rounded px-6 py-2 mb-4 hover:bg-gray-100 text-center shadow-xl" onClick={() => navigate('/DimandForm', { state: { clientNames: clientNames } })}>
           <span role="img" aria-label="add" className="text-white">➕</span>
           Add New Diamond
         </button>
@@ -323,11 +313,11 @@ const Home = () => {
           onChange={e => setStatus(e.target.value)}
           className="border rounded px-4 py-2 w-full"
         >
-          <option value="all">All</option>
-          <option value="pending">Pending</option>
-          <option value="complete">Complete</option>
+          <option value="0">All</option>
+          <option value="1">Pending</option>
+          <option value="2">Complete</option>
         </select>
-        <button className="bg-white text-black rounded px-4 py-2 w-full shadow-lg hover:bg-gray-100" onClick={handleSearch}>
+        <button className="bg-white text-black rounded px-4 py-2 w-full shadow-lg hover:bg-gray-100" onClick={() => {fetchList(1, pageSize, false); setIsSearch(true); setCurrentPage(1);}}>
           <span role="img" aria-label="search">🔍</span>
           Search
         </button>
@@ -380,7 +370,10 @@ const Home = () => {
                 <td className="px-4 py-2">{item.totalPrice}</td>
                 <td className="px-4 py-2">{item.end_Date}</td>
                 <td className="px-4 py-2 space-x-2">
-                  <button className="bg-btnAdd text-white px-3 py-1 rounded hover:bg-blue-600" onClick={() => navigate('/DimandForm', { state: { data: item } })}>
+                  <button className="bg-btnAdd text-white px-3 py-1 rounded hover:bg-blue-600" onClick={() => {
+                    console.log("client names:", clientNames);
+                    navigate('/DimandForm', { state: { data: item, clientNames: clientNames } })
+                  }}>
                     Edit
                   </button>
                   <button className="bg-delete text-white px-3 py-1 rounded hover:bg-red-600" onClick={() => { setCurrentPage(1); handleDelete(item.id) }}>
