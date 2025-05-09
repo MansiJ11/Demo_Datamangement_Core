@@ -406,6 +406,8 @@ namespace RadheDaimond.Helper
 
                 if (!ignorePagination)
                     query += " ORDER BY Id DESC LIMIT @PageSize OFFSET @Offset";
+                else
+                    query += " ORDER BY Id DESC";
 
                 using (MySqlCommand cmd = new MySqlCommand(query, conn))
                 {
