@@ -36,6 +36,7 @@ namespace RadheDaimond.Helper
             List<Product> products = new List<Product>();
             totalRecords = 0;
             decimal total = 0;
+            decimal Amount = 0;
 
             using (MySqlConnection conn = new MySqlConnection(connStr))
             {
@@ -66,6 +67,8 @@ namespace RadheDaimond.Helper
                             decimal parsedTotal = 0;
                             decimal.TryParse(totalPrice, out parsedTotal);
                             total += parsedTotal;
+                            if (decimal.TryParse(totalPrice, out var tp))
+                                Amount += tp;
 
                             var product = new Product
                             {
@@ -77,7 +80,8 @@ namespace RadheDaimond.Helper
                                 End_Date = reader["End_Date"]?.ToString(),
                                 Product_Price = priceStr,
                                 TotalPrice = totalPrice,
-                                TotalAmount = "" // You can leave this blank or set later
+                                Pics = reader.GetString("Pics"),
+                                Weight = reader.GetString("Weight")
                             };
 
                             products.Add(product);
@@ -86,7 +90,7 @@ namespace RadheDaimond.Helper
                 }
             }
 
-            totalAmount = total.ToString("F2"); // e.g., "15000.50"
+            totalAmount = Amount.ToString("0.00"); // e.g., "15000.50"
             return products;
         }
 

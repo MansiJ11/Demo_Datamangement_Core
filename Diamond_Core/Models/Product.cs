@@ -15,8 +15,11 @@ namespace RadheDaimond.Models
         public string Start_Date { get; set; }
         public string End_Date { get; set; }
         public string Product_Price { get; set; }
+        public string Pics { get; set; }
+        public string Weight { get; set; }
         public string TotalPrice { get; set; }
         public string TotalAmount { get; set; }
+
     }
 
     public class AddProductRequest
