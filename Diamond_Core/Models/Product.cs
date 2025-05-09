@@ -34,7 +34,9 @@ namespace RadheDaimond.Models
 
         [Required]
         public string Start_Date { get; set; }
+        [Required]
         public string Product_Price { get; set; }
+        [Required]
         public string Pics { get; set; }
 
     }
