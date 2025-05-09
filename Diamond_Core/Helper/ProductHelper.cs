@@ -80,8 +80,7 @@ namespace RadheDaimond.Helper
                                 End_Date = reader["End_Date"]?.ToString(),
                                 Product_Price = priceStr,
                                 TotalPrice = totalPrice,
-                                Pics = reader.GetString("Pics"),
-                                Weight = reader.GetString("Weight")
+                                Pics = reader.GetString("Pics")
                             };
 
                             products.Add(product);
@@ -136,8 +135,8 @@ namespace RadheDaimond.Helper
             using (MySqlConnection conn = new MySqlConnection(connStr))
             {
                 conn.Open();
-                string query = @"INSERT INTO product (Name, PackageNo, Grams, Start_Date,Product_Price,Pics,Weight) 
-                         VALUES (@Name, @PackageNo, @Grams, @Start_Date,@Product_Price,@Pics,@Weight)";
+                string query = @"INSERT INTO product (Name, PackageNo, Grams, Start_Date,Product_Price,Pics) 
+                         VALUES (@Name, @PackageNo, @Grams, @Start_Date,@Product_Price,@Pics)";
 
                 using (MySqlCommand cmd = new MySqlCommand(query, conn))
                 {
@@ -147,7 +146,7 @@ namespace RadheDaimond.Helper
                     cmd.Parameters.AddWithValue("@Start_Date", product.Start_Date);
                     cmd.Parameters.AddWithValue("@Product_Price", product.Product_Price);
                     cmd.Parameters.AddWithValue("@Pics", product.Pics);
-                    cmd.Parameters.AddWithValue("@Weight", product.Weight);
+
 
                     return cmd.ExecuteNonQuery() > 0;
                 }
