@@ -49,7 +49,7 @@ namespace RadheDaimond.Helper
                 }
 
                 int offset = (pageNumber - 1) * pageSize;
-                string query = "SELECT * FROM product ORDER BY Id LIMIT @Limit OFFSET @Offset";
+                string query = "SELECT * FROM product ORDER BY Id DESC LIMIT @Limit OFFSET @Offset";
 
                 using (MySqlCommand cmd = new MySqlCommand(query, conn))
                 {
