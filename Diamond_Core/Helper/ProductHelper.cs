@@ -80,7 +80,7 @@ namespace RadheDaimond.Helper
                                 End_Date = reader["End_Date"]?.ToString(),
                                 Product_Price = priceStr,
                                 TotalPrice = totalPrice,
-                                Pics = reader.GetString("Pics")
+                                pics = reader.GetString("Pics")
                             };
 
                             products.Add(product);
