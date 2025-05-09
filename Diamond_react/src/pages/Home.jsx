@@ -189,7 +189,7 @@ const Home = () => {
 
       if (response.ok) {
         fetchList(1, pageSize, false); // Refresh the list after deletion
-        setSuccess('Product Return successfully!');
+        // setSuccess('Product Return successfully!');
       } else {
         setError(data.message || 'Failed to update product.');
       }
