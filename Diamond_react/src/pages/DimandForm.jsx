@@ -45,7 +45,6 @@ const DimandForm = () => {
         end_Date: '',
         start_Date: '',
         pics: '',
-        weight: ''
     });
 
     const [filteredSuggestions, setFilteredSuggestions] = useState(clientNames ? clientNames : []);
@@ -69,7 +68,6 @@ const DimandForm = () => {
                 end_Date: state.data.end_Date,
                 start_Date: state.data.start_Date,
                 pics: state.data.pics || '',
-                weight: state.data.weight || ''
             });
             setId(state.data.id)
             setIsEdit(true);
@@ -93,17 +91,17 @@ const DimandForm = () => {
 
         e.preventDefault();
 
-        const { name, packageNo, grams, product_Price, start_Date, end_Date, pics, weight } = formData;
+        const { name, packageNo, grams, product_Price, start_Date, end_Date, pics } = formData;
 
         // Basic validation
-        if (!name || !packageNo || !grams || !start_Date || !product_Price || !pics || !weight) {
+        if (!name || !packageNo || !grams || !start_Date || !product_Price || !pics ) {
             setError('Please fill in all fields.');
             setLoading(false);
             return;
         }
 
-        if (Number(grams) <= 0 || Number(product_Price) <= 0 || Number(pics) <= 0 || Number(weight) <= 0) {
-            setError('Grams, pics, weight and Product Price must be positive numbers.');
+        if (Number(grams) <= 0 || Number(product_Price) <= 0 || Number(pics) <= 0 ) {
+            setError('Grams, pics and Product Price must be positive numbers.');
             setLoading(false);
             return;
         }
@@ -157,7 +155,6 @@ const DimandForm = () => {
                         Start_Date: start_Date,
                         End_Date: end_Date,
                         Pics: pics,
-                        Weight: weight,
                     })
                 });
 
@@ -305,13 +302,13 @@ const DimandForm = () => {
 
                     {/* Pics */}
                     <div>
-                        <label className="block text-gray-600 mb-2" htmlFor="pics">Pics</label>
+                        <label className="block text-gray-600 mb-2" htmlFor="pics">Pieces</label>
                         <input
                             type="number"
                             name="pics"
                             id="pics"
                             value={formData.pics}
-                            placeholder="Pics"
+                            placeholder="Pieces"
                             onChange={handleChange}
                             className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
                             required
@@ -319,22 +316,7 @@ const DimandForm = () => {
                         />
                     </div>
 
-                    {/* Weight */}
-                    <div>
-                        <label className="block text-gray-600 mb-2" htmlFor="weight">Weight</label>
-                        <input
-                            type="number"
-                            name="weight"
-                            id="weight"
-                            value={formData.weight}
-                            placeholder="Weight"
-                            onChange={handleChange}
-                            className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
-                            required
-                            disabled={isEdit}
-                        />
-                    </div>
-
+                   
                     {/* Start Date */}
                     <div>
                         <label className="block text-gray-600 mb-2" htmlFor="start_Date">Issue Date</label>

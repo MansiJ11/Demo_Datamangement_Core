@@ -160,6 +160,7 @@ const Home = () => {
       }
 
       alert('Product deleted successfully');
+      setCurrentPage(1);
       fetchList(1, pageSize, false); // Refresh the list after deletion
     } catch (error) {
       console.error('Error deleting product:', error);
@@ -168,15 +169,45 @@ const Home = () => {
       setLoading(false);
     }
   };
+  const handleReturn = async (id) => {
+    if (!window.confirm('Are you sure you wanted to complete the order')) return;
+
+    try {
+      setLoading(true);
+      const response = await fetch(`https://diamond-core.onrender.com/api/Product/EditProduct/${id}`, {
+        method: 'PUT', // or 'POST' if backend requires
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          IsComplete: 1
+        })
+      });
+      // const data = await response.json();
+      console.log("return response", response);
+      setLoading(false);
+
+      if (response.ok) {
+        fetchList(1, pageSize, false); // Refresh the list after deletion
+        setSuccess('Product Return successfully!');
+      } else {
+        setError(data.message || 'Failed to update product.');
+      }
+    } catch (error) {
+
+    } finally {
+      setLoading(false);
+    }
+  }
 
 
   const handleDownloadPDF = async () => {
 
     let data = [] // Fetch data for PDF download
 
-  
-      data = await fetchList(currentPage, totalItems, true); // Fetch data for PDF download
-    
+
+    data = await fetchList(currentPage, totalItems, true); // Fetch data for PDF download
+
 
     const doc = new jsPDF();
 
@@ -200,6 +231,7 @@ const Home = () => {
       "Issue Date",
       "Name",
       "Package No",
+      "Pieces",
       "Crt",
       "Product Price",
       "Total Price",
@@ -210,6 +242,7 @@ const Home = () => {
       item.start_Date,
       item.name,
       item.packageNo,
+      item.pics,
       item.grams,
       item.product_Price,
       item.totalPrice,
@@ -231,8 +264,8 @@ const Home = () => {
 
     let data = [] // Fetch data for PDF download
 
-      data = await fetchList(currentPage, totalItems, true); // Fetch data for PDF download
-    
+    data = await fetchList(currentPage, totalItems, true); // Fetch data for PDF download
+
 
     const workbook = XLSX.utils.book_new();
 
@@ -241,6 +274,7 @@ const Home = () => {
       IssueDate: item.start_Date,
       Name: item.name,
       PackageNo: item.packageNo,
+      Pieces: item.pics,
       Crt: item.grams,
       ProductPrice: item.product_Price,
       TotalPrice: item.totalPrice,
@@ -317,21 +351,21 @@ const Home = () => {
           <option value="1">Pending</option>
           <option value="2">Complete</option>
         </select>
-        <button className="bg-white text-black rounded px-4 py-2 w-full shadow-lg hover:bg-gray-100" onClick={() => {fetchList(1, pageSize, false); setIsSearch(true); setCurrentPage(1);}}>
+        <button className="bg-white text-black rounded px-4 py-2 w-full shadow-lg hover:bg-gray-100" onClick={() => { fetchList(1, pageSize, false); setIsSearch(true); setCurrentPage(1); }}>
           <span role="img" aria-label="search">🔍</span>
           Search
         </button>
         <button
           className="bg-red-500 text-white rounded px-4 py-2 w-full shadow-lg hover:bg-red-600"
-          onClick={() => { 
-            setName(''); 
-            setStartDate(''); 
-            setEndDate(''); 
-            setStatus(0); 
-            setIsSearch(false); 
-            setCurrentPage(1); 
-            setPageSize(10); 
-            fetchList(1, pageSize, false); 
+          onClick={() => {
+            setName('');
+            setStartDate('');
+            setEndDate('');
+            setStatus(0);
+            setIsSearch(false);
+            setCurrentPage(1);
+            setPageSize(10);
+            fetchList(1, pageSize, false);
           }}
         >
           Reset
@@ -348,6 +382,7 @@ const Home = () => {
               <th className="px-4 py-3">Issue Date</th>
               <th className="px-4 py-3">Name</th>
               <th className="px-4 py-3">Package No</th>
+              <th className="px-4 py-3">Pieces</th>
               <th className="px-4 py-3">Crt</th>
               <th className="px-4 py-3">Product Price</th>
               <th className="px-4 py-3">Total Price</th>
@@ -365,6 +400,7 @@ const Home = () => {
                 <td className="px-4 py-2">{item.start_Date}</td>
                 <td className="px-4 py-2">{item.name}</td>
                 <td className="px-4 py-2">{item.packageNo}</td>
+                <td className="px-4 py-2">{item.pics}</td>
                 <td className="px-4 py-2">{item.grams}</td>
                 <td className="px-4 py-2">{item.product_Price}</td>
                 <td className="px-4 py-2">{item.totalPrice}</td>
@@ -372,11 +408,11 @@ const Home = () => {
                 <td className="px-4 py-2 space-x-2">
                   <button className="bg-btnAdd text-white px-3 py-1 rounded hover:bg-blue-600" onClick={() => {
                     console.log("client names:", clientNames);
-                    navigate('/DimandForm', { state: { data: item, clientNames: clientNames } })
+                    handleReturn(item.id)
                   }}>
-                    Edit
+                    Return
                   </button>
-                  <button className="bg-delete text-white px-3 py-1 rounded hover:bg-red-600" onClick={() => { setCurrentPage(1); handleDelete(item.id) }}>
+                  <button className="bg-delete text-white px-3 py-1 rounded hover:bg-red-600" onClick={() => { handleDelete(item.id) }}>
                     Delete
                   </button>
                 </td>
