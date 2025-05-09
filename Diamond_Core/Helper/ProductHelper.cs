@@ -351,7 +351,7 @@ namespace RadheDaimond.Helper
 
                 if (!ignorePagination)
                 {
-                    query += " LIMIT @PageSize OFFSET @Offset";
+                    query += " ORDER BY Id DESC LIMIT @PageSize OFFSET @Offset";
                 }
 
                 using (MySqlCommand cmd = new MySqlCommand(query, conn))
@@ -390,7 +390,8 @@ namespace RadheDaimond.Helper
                                 Start_Date = reader.GetString("Start_Date"),
                                 End_Date = reader["End_Date"]?.ToString(),
                                 Product_Price = priceStr,
-                                TotalPrice = totalPrice
+                                TotalPrice = totalPrice,
+                                Pics = reader.GetString("Pics")
                             });
                         }
                     }
