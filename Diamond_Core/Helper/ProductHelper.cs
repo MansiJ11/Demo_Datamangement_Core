@@ -160,7 +160,7 @@ namespace RadheDaimond.Helper
             {
                 conn.Open();
 
-                string? endDateValue = product.IsComplete == 1 ? DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"): null;
+                string? endDateValue = product.IsComplete == 1 ? DateTime.Now.ToString("yyyy-MM-dd"): null;
 
                 string query = @"UPDATE product 
                          SET End_Date = @End_Date WHERE Id = @Id";
