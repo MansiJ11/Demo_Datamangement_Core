@@ -445,7 +445,7 @@ namespace RadheDaimond.Helper
                                 End_Date = endDateValue,
                                 Product_Price = priceStr,
                                 TotalPrice = totalPrice,
-                                pics = reader.GetString("Pics")
+                                pics = reader["Pics"]?.ToString()
                             });
                         }
                     }
