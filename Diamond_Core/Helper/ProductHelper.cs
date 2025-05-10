@@ -402,7 +402,7 @@ namespace RadheDaimond.Helper
 
                 // Fetch paginated data
                 int offset = (pageNumber - 1) * pageSize;
-                string query = $"SELECT * FROM product {whereClause} ORDER BY Id";
+                string query = $"SELECT * FROM product {whereClause}";
 
                 if (!ignorePagination)
                     query += " ORDER BY Id DESC LIMIT @PageSize OFFSET @Offset";
