@@ -12,6 +12,7 @@ namespace RadheDaimond.Helper
     public class ProductHelper
     {
         private readonly string connStr;
+        private decimal _totalAmount = 0;
 
         public ProductHelper(IConfiguration configuration)
         {
@@ -28,6 +29,16 @@ namespace RadheDaimond.Helper
             }
 
             return "0.00"; // fallback if data is not valid
+        }
+
+        private string CalculateTotalAmount( string totalPriceStr)
+        {
+            if (decimal.TryParse(totalPriceStr, out decimal price))
+            {
+                _totalAmount += price;
+            }
+
+            return _totalAmount.ToString("0.00");
         }
 
 
@@ -371,6 +382,7 @@ namespace RadheDaimond.Helper
             List<Product> products = new List<Product>();
             decimal totalAmount = 0;
             int totalRecords = 0;
+            string amountTotal = "0.00";
 
             using (MySqlConnection conn = new MySqlConnection(connStr))
             {
@@ -428,9 +440,12 @@ namespace RadheDaimond.Helper
                             string gramsStr = reader["Grams"]?.ToString();
                             string priceStr = reader["Product_Price"]?.ToString();
                             string totalPrice = CalculateTotalPrice(gramsStr, priceStr);
+                         
+                           
+                             amountTotal = CalculateTotalAmount(totalPrice);
 
-                            if (decimal.TryParse(totalPrice, out var tp))
-                                totalAmount += tp;
+                            //if (decimal.TryParse(totalPrice, out var tp))
+                            //    totalAmount += tp;
 
                             string endDateValue = reader["End_Date"]?.ToString();
                             string statusStr = string.IsNullOrEmpty(endDateValue) ? "Pending" : "Completed";
@@ -455,7 +470,7 @@ namespace RadheDaimond.Helper
             return new ProductSearchResult
             {
                 Products = products,
-                TotalAmount = totalAmount.ToString("0.00"),
+                TotalAmount = amountTotal,
                 TotalRecords = totalRecords
             };
         }
