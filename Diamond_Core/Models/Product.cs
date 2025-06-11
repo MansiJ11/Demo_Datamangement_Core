@@ -17,7 +17,7 @@ namespace RadheDaimond.Models
         public string Product_Price { get; set; }
         public string pics { get; set; }
         public string TotalPrice { get; set; }
-        public string TotalAmount { get; set; }
+        //public string TotalAmount { get; set; }
 
     }
 
