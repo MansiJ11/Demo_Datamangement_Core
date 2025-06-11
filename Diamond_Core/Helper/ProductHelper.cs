@@ -383,6 +383,7 @@ namespace RadheDaimond.Helper
             decimal totalAmount = 0;
             int totalRecords = 0;
             string amountTotal = "0.00";
+            _totalAmount = 0;
 
             using (MySqlConnection conn = new MySqlConnection(connStr))
             {
@@ -442,8 +443,8 @@ namespace RadheDaimond.Helper
                             string totalPrice = CalculateTotalPrice(gramsStr, priceStr);
                          
                            
-                             amountTotal = CalculateTotalAmount(totalPrice);
-
+                             //amountTotal = CalculateTotalAmount(totalPrice);
+                            CalculateTotalAmount(totalPrice);
                             //if (decimal.TryParse(totalPrice, out var tp))
                             //    totalAmount += tp;
 
@@ -470,7 +471,7 @@ namespace RadheDaimond.Helper
             return new ProductSearchResult
             {
                 Products = products,
-                TotalAmount = amountTotal,
+                TotalAmount = _totalAmount.ToString("0.00"),
                 TotalRecords = totalRecords
             };
         }
