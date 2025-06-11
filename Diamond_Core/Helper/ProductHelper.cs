@@ -441,9 +441,9 @@ namespace RadheDaimond.Helper
                             string gramsStr = reader["Grams"]?.ToString();
                             string priceStr = reader["Product_Price"]?.ToString();
                             string totalPrice = CalculateTotalPrice(gramsStr, priceStr);
-                         
-                           
-                             //amountTotal = CalculateTotalAmount(totalPrice);
+
+
+                            //amountTotal = CalculateTotalAmount(totalPrice);
                             CalculateTotalAmount(totalPrice);
                             //if (decimal.TryParse(totalPrice, out var tp))
                             //    totalAmount += tp;
@@ -460,7 +460,7 @@ namespace RadheDaimond.Helper
                                 Start_Date = reader.GetString("Start_Date"),
                                 End_Date = endDateValue,
                                 Product_Price = priceStr,
-                                TotalPrice = totalPrice,
+                                TotalPrice = priceStr,
                                 pics = reader["Pics"]?.ToString()
                             });
                         }
@@ -515,7 +515,6 @@ namespace RadheDaimond.Helper
 
             return clientNames;
         }
-
 
 
 

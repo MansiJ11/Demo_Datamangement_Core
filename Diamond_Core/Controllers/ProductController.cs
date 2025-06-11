@@ -4,7 +4,7 @@ using RadheDaimond.Helper;
 using RadheDaimond.Models;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-
+ // product
 namespace Diamond_Core.Controllers
 {
     [Route("api/[controller]")]
