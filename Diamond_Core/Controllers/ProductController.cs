@@ -151,7 +151,7 @@ namespace Diamond_Core.Controllers
                 Page = page,
                 PageSize = size,
                 TotalPages = totalPages,
-                TotalAmount = result.TotalAmount,
+               // Amount = result.TotalAmount,
                 Data = result.Products
             });
         }
