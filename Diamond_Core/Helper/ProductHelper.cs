@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Web;
 using MySql.Data.MySqlClient;
+using MySqlX.XDevAPI.Relational;
 using RadheDaimond.Models;
 
 namespace RadheDaimond.Helper
@@ -47,7 +48,7 @@ namespace RadheDaimond.Helper
             List<Product> products = new List<Product>();
             totalRecords = 0;
             decimal total = 0;
-            decimal Amount = 0;
+            string Amount = "0.00";
 
             using (MySqlConnection conn = new MySqlConnection(connStr))
             {
@@ -75,11 +76,13 @@ namespace RadheDaimond.Helper
                             string priceStr = reader["Product_Price"]?.ToString();
                             string totalPrice = CalculateTotalPrice(gramsStr, priceStr);
 
+
                             decimal parsedTotal = 0;
                             decimal.TryParse(totalPrice, out parsedTotal);
                             total += parsedTotal;
-                            if (decimal.TryParse(totalPrice, out var tp))
-                                Amount += tp;
+                         //Amount = CalculateTotalAmount(total);
+                            //if (decimal.TryParse(totalPrice, out var tp))
+                            //    Amount += tp;
 
                             var product = new Product
                             {
@@ -100,7 +103,7 @@ namespace RadheDaimond.Helper
                 }
             }
 
-            totalAmount = Amount.ToString("0.00"); // e.g., "15000.50"
+            totalAmount = Amount; // e.g., "15000.50"
             return products;
         }
 
@@ -377,104 +380,107 @@ namespace RadheDaimond.Helper
         }
 
 
-        public ProductSearchResult GetSearchProducts(string startDate, string endDate, string name, int? status, int pageNumber, int pageSize, bool ignorePagination = false)
-        {
-            List<Product> products = new List<Product>();
-            decimal totalAmount = 0;
-            int totalRecords = 0;
-            string amountTotal = "0.00";
-            _totalAmount = 0;
+        //public ProductSearchResult GetSearchProducts(string startDate, string endDate, string name, int? status, int pageNumber, int pageSize, bool ignorePagination = false)
+        //{
+        //    List<Product> products = new List<Product>();
+        //    decimal totalAmount = 0;
+        //    int totalRecords = 0;
+        //    string amountTotal = "0.00";
+        //    _totalAmount = 0;
 
-            using (MySqlConnection conn = new MySqlConnection(connStr))
-            {
-                conn.Open();
+        //    using (MySqlConnection conn = new MySqlConnection(connStr))
+        //    {
+        //        conn.Open();
 
-                // Build WHERE conditions
-                List<string> conditions = new List<string>();
-                if (!string.IsNullOrWhiteSpace(startDate)) conditions.Add("Start_Date >= @StartDate");
-                if (!string.IsNullOrWhiteSpace(endDate)) conditions.Add("End_Date <= @EndDate");
-                if (!string.IsNullOrWhiteSpace(name)) conditions.Add("Name LIKE @Name");
+        //        // Build WHERE conditions
+        //        List<string> conditions = new List<string>();
+        //        if (!string.IsNullOrWhiteSpace(startDate)) conditions.Add("Start_Date >= @StartDate");
+        //        if (!string.IsNullOrWhiteSpace(endDate)) conditions.Add("End_Date <= @EndDate");
+        //        if (!string.IsNullOrWhiteSpace(name)) conditions.Add("Name LIKE @Name");
 
-                if (status == 1)
-                    conditions.Add("End_Date IS NULL"); // Pending
-                else if (status == 2)
-                    conditions.Add("End_Date IS NOT NULL"); // Completed
+        //        if (status == 1)
+        //            conditions.Add("End_Date IS NULL"); // Pending
+        //        else if (status == 2)
+        //            conditions.Add("End_Date IS NOT NULL"); // Completed
 
-                string whereClause = conditions.Any() ? "WHERE " + string.Join(" AND ", conditions) : "";
+        //        string whereClause = conditions.Any() ? "WHERE " + string.Join(" AND ", conditions) : "";
 
-                // Get total count
-                string countQuery = $"SELECT COUNT(*) FROM product {whereClause}";
-                using (MySqlCommand countCmd = new MySqlCommand(countQuery, conn))
-                {
-                    if (!string.IsNullOrWhiteSpace(startDate)) countCmd.Parameters.AddWithValue("@StartDate", startDate);
-                    if (!string.IsNullOrWhiteSpace(endDate)) countCmd.Parameters.AddWithValue("@EndDate", endDate);
-                    if (!string.IsNullOrWhiteSpace(name)) countCmd.Parameters.AddWithValue("@Name", "%" + name + "%");
+        //        // Get total count
+        //        string countQuery = $"SELECT COUNT(*) FROM product {whereClause}";
+        //        using (MySqlCommand countCmd = new MySqlCommand(countQuery, conn))
+        //        {
+        //            if (!string.IsNullOrWhiteSpace(startDate)) countCmd.Parameters.AddWithValue("@StartDate", startDate);
+        //            if (!string.IsNullOrWhiteSpace(endDate)) countCmd.Parameters.AddWithValue("@EndDate", endDate);
+        //            if (!string.IsNullOrWhiteSpace(name)) countCmd.Parameters.AddWithValue("@Name", "%" + name + "%");
 
-                    totalRecords = Convert.ToInt32(countCmd.ExecuteScalar());
-                }
+        //            totalRecords = Convert.ToInt32(countCmd.ExecuteScalar());
 
-                // Fetch paginated data
-                int offset = (pageNumber - 1) * pageSize;
-                string query = $"SELECT * FROM product {whereClause}";
-
-                if (!ignorePagination)
-                    query += " ORDER BY Id DESC LIMIT @PageSize OFFSET @Offset";
-                else
-                    query += " ORDER BY Id DESC";
-
-                using (MySqlCommand cmd = new MySqlCommand(query, conn))
-                {
-                    if (!string.IsNullOrWhiteSpace(startDate)) cmd.Parameters.AddWithValue("@StartDate", startDate);
-                    if (!string.IsNullOrWhiteSpace(endDate)) cmd.Parameters.AddWithValue("@EndDate", endDate);
-                    if (!string.IsNullOrWhiteSpace(name)) cmd.Parameters.AddWithValue("@Name", "%" + name + "%");
-
-                    if (!ignorePagination)
-                    {
-                        cmd.Parameters.AddWithValue("@PageSize", pageSize);
-                        cmd.Parameters.AddWithValue("@Offset", offset);
-                    }
-
-                    using (MySqlDataReader reader = cmd.ExecuteReader())
-                    {
-                        while (reader.Read())
-                        {
-                            string gramsStr = reader["Grams"]?.ToString();
-                            string priceStr = reader["Product_Price"]?.ToString();
-                            string totalPrice = CalculateTotalPrice(gramsStr, priceStr);
+        //        }
 
 
-                            //amountTotal = CalculateTotalAmount(totalPrice);
-                            CalculateTotalAmount(totalPrice);
-                            //if (decimal.TryParse(totalPrice, out var tp))
-                            //    totalAmount += tp;
 
-                            string endDateValue = reader["End_Date"]?.ToString();
-                            string statusStr = string.IsNullOrEmpty(endDateValue) ? "Pending" : "Completed";
+        //        // Fetch paginated data
+        //        int offset = (pageNumber - 1) * pageSize;
+        //        string query = $"SELECT * FROM product {whereClause}";
 
-                            products.Add(new Product
-                            {
-                                Id = reader.GetInt32("Id"),
-                                Name = reader.GetString("Name"),
-                                PackageNo = reader.GetString("PackageNo"),
-                                Grams = gramsStr,
-                                Start_Date = reader.GetString("Start_Date"),
-                                End_Date = endDateValue,
-                                Product_Price = priceStr,
-                                TotalPrice = priceStr,
-                                pics = reader["Pics"]?.ToString()
-                            });
-                        }
-                    }
-                }
-            }
+        //        if (!ignorePagination)
+        //            query += " ORDER BY Id DESC LIMIT @PageSize OFFSET @Offset";
+        //        else
+        //            query += " ORDER BY Id DESC";
 
-            return new ProductSearchResult
-            {
-                Products = products,
-                TotalAmount = _totalAmount.ToString("0.00"),
-                TotalRecords = totalRecords
-            };
-        }
+        //        using (MySqlCommand cmd = new MySqlCommand(query, conn))
+        //        {
+        //            if (!string.IsNullOrWhiteSpace(startDate)) cmd.Parameters.AddWithValue("@StartDate", startDate);
+        //            if (!string.IsNullOrWhiteSpace(endDate)) cmd.Parameters.AddWithValue("@EndDate", endDate);
+        //            if (!string.IsNullOrWhiteSpace(name)) cmd.Parameters.AddWithValue("@Name", "%" + name + "%");
+
+        //            if (!ignorePagination)
+        //            {
+        //                cmd.Parameters.AddWithValue("@PageSize", pageSize);
+        //                cmd.Parameters.AddWithValue("@Offset", offset);
+        //            }
+
+        //            using (MySqlDataReader reader = cmd.ExecuteReader())
+        //            {
+        //                while (reader.Read())
+        //                {
+        //                    string gramsStr = reader["Grams"]?.ToString();
+        //                    string priceStr = reader["Product_Price"]?.ToString();
+        //                    string totalPrice = CalculateTotalPrice(gramsStr, priceStr);
+
+
+        //                    //amountTotal = CalculateTotalAmount(totalPrice);
+        //                    CalculateTotalAmount(totalPrice);
+        //                    //if (decimal.TryParse(totalPrice, out var tp))
+        //                    //    totalAmount += tp;
+
+        //                    string endDateValue = reader["End_Date"]?.ToString();
+        //                    string statusStr = string.IsNullOrEmpty(endDateValue) ? "Pending" : "Completed";
+
+        //                    products.Add(new Product
+        //                    {
+        //                        Id = reader.GetInt32("Id"),
+        //                        Name = reader.GetString("Name"),
+        //                        PackageNo = reader.GetString("PackageNo"),
+        //                        Grams = gramsStr,
+        //                        Start_Date = reader.GetString("Start_Date"),
+        //                        End_Date = endDateValue,
+        //                        Product_Price = priceStr,
+        //                        TotalPrice = totalPrice,
+        //                        pics = reader["Pics"]?.ToString()
+        //                    });
+        //                }
+        //            }
+        //        }
+        //    }
+
+        //    return new ProductSearchResult
+        //    {
+        //        Products = products,
+        //        TotalAmount = _totalAmount.ToString("0.00"),
+        //        TotalRecords = totalRecords
+        //    };
+        //}
 
 
         public bool InsertClient(AddClient value)
@@ -516,6 +522,110 @@ namespace RadheDaimond.Helper
             return clientNames;
         }
 
+        public ProductSearchResult GetSearchProducts(string startDate, string endDate, string name, int? status, int pageNumber, int pageSize, bool ignorePagination = false)
+        {
+            List<Product> products = new List<Product>();
+            decimal totalAmount = 0;
+            int totalRecords = 0;
+
+            using (MySqlConnection conn = new MySqlConnection(connStr))
+            {
+                conn.Open();
+
+                // Build WHERE conditions
+                List<string> conditions = new List<string>();
+                if (!string.IsNullOrWhiteSpace(startDate)) conditions.Add("Start_Date >= @StartDate");
+                if (!string.IsNullOrWhiteSpace(endDate)) conditions.Add("End_Date <= @EndDate");
+                if (!string.IsNullOrWhiteSpace(name)) conditions.Add("Name LIKE @Name");
+
+                if (status == 1)
+                    conditions.Add("End_Date IS NULL"); // Pending
+                else if (status == 2)
+                    conditions.Add("End_Date IS NOT NULL"); // Completed
+
+                string whereClause = conditions.Any() ? "WHERE " + string.Join(" AND ", conditions) : "";
+
+                // Get total record count
+                string countQuery = $"SELECT COUNT(*) FROM product {whereClause}";
+                using (MySqlCommand countCmd = new MySqlCommand(countQuery, conn))
+                {
+                    if (!string.IsNullOrWhiteSpace(startDate)) countCmd.Parameters.AddWithValue("@StartDate", startDate);
+                    if (!string.IsNullOrWhiteSpace(endDate)) countCmd.Parameters.AddWithValue("@EndDate", endDate);
+                    if (!string.IsNullOrWhiteSpace(name)) countCmd.Parameters.AddWithValue("@Name", "%" + name + "%");
+
+                    totalRecords = Convert.ToInt32(countCmd.ExecuteScalar());
+                }
+
+                // ✅ Get total amount (all matching rows, NOT just paginated)
+                string sumQuery = $"SELECT SUM(CAST(Grams AS DECIMAL(10,2)) * CAST(Product_Price AS DECIMAL(10,2))) FROM product {whereClause}";
+                using (MySqlCommand sumCmd = new MySqlCommand(sumQuery, conn))
+                {
+                    if (!string.IsNullOrWhiteSpace(startDate)) sumCmd.Parameters.AddWithValue("@StartDate", startDate);
+                    if (!string.IsNullOrWhiteSpace(endDate)) sumCmd.Parameters.AddWithValue("@EndDate", endDate);
+                    if (!string.IsNullOrWhiteSpace(name)) sumCmd.Parameters.AddWithValue("@Name", "%" + name + "%");
+
+                    object sumResult = sumCmd.ExecuteScalar();
+                    if (sumResult != DBNull.Value && sumResult != null)
+                        totalAmount = Convert.ToDecimal(sumResult);
+                }
+
+                // Fetch paginated data
+                int offset = (pageNumber - 1) * pageSize;
+                string query = $"SELECT * FROM product {whereClause} ORDER BY Id DESC";
+                if (!ignorePagination)
+                    query += " LIMIT @PageSize OFFSET @Offset";
+
+                using (MySqlCommand cmd = new MySqlCommand(query, conn))
+                {
+                    if (!string.IsNullOrWhiteSpace(startDate)) cmd.Parameters.AddWithValue("@StartDate", startDate);
+                    if (!string.IsNullOrWhiteSpace(endDate)) cmd.Parameters.AddWithValue("@EndDate", endDate);
+                    if (!string.IsNullOrWhiteSpace(name)) cmd.Parameters.AddWithValue("@Name", "%" + name + "%");
+
+                    if (!ignorePagination)
+                    {
+                        cmd.Parameters.AddWithValue("@PageSize", pageSize);
+                        cmd.Parameters.AddWithValue("@Offset", offset);
+                    }
+
+                    using (MySqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            string gramsStr = reader["Grams"]?.ToString();
+                            string priceStr = reader["Product_Price"]?.ToString();
+                            string totalPrice = "0.00";
+
+                            if (decimal.TryParse(gramsStr, out var grams) && decimal.TryParse(priceStr, out var price))
+                            {
+                                totalPrice = (grams * price).ToString("0.00");
+                            }
+
+                            string endDateValue = reader["End_Date"]?.ToString();
+
+                            products.Add(new Product
+                            {
+                                Id = reader.GetInt32("Id"),
+                                Name = reader.GetString("Name"),
+                                PackageNo = reader.GetString("PackageNo"),
+                                Grams = gramsStr,
+                                Start_Date = reader.GetString("Start_Date"),
+                                End_Date = endDateValue,
+                                Product_Price = priceStr,
+                                TotalPrice = totalPrice,
+                                pics = reader["Pics"]?.ToString()
+                            });
+                        }
+                    }
+                }
+            }
+
+            return new ProductSearchResult
+            {
+                Products = products,
+                TotalAmount = totalAmount.ToString("0.00"),
+                TotalRecords = totalRecords
+            };
+        }
 
 
     }
