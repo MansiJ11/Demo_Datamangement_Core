@@ -11,7 +11,7 @@ namespace RadheDaimond.Models
         public int Id { get; set; }
         public string Name { get; set; }
         public string PackageNo { get; set; }
-        public decimal Grams { get; set; }
+        public string Grams { get; set; }
         public string Start_Date { get; set; }
         public string End_Date { get; set; }
         public string Product_Price { get; set; }

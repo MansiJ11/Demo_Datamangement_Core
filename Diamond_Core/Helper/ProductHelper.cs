@@ -72,10 +72,7 @@ namespace RadheDaimond.Helper
                     {
                         while (reader.Read())
                         {
-                            decimal grams = 0;
                             string gramsStr = reader["Grams"]?.ToString();
-                            decimal.TryParse(gramsStr, out grams);
-
                             string priceStr = reader["Product_Price"]?.ToString();
                             string totalPrice = CalculateTotalPrice(gramsStr, priceStr);
 
@@ -83,7 +80,7 @@ namespace RadheDaimond.Helper
                             decimal parsedTotal = 0;
                             decimal.TryParse(totalPrice, out parsedTotal);
                             total += parsedTotal;
-                            //Amount = CalculateTotalAmount(total);
+                         //Amount = CalculateTotalAmount(total);
                             //if (decimal.TryParse(totalPrice, out var tp))
                             //    Amount += tp;
 
@@ -92,7 +89,7 @@ namespace RadheDaimond.Helper
                                 Id = reader.GetInt32("Id"),
                                 Name = reader.GetString("Name"),
                                 PackageNo = reader.GetString("PackageNo"),
-                                Grams = grams,
+                                Grams = gramsStr,
                                 Start_Date = reader.GetString("Start_Date"),
                                 End_Date = reader["End_Date"]?.ToString(),
                                 Product_Price = priceStr,
@@ -125,9 +122,6 @@ namespace RadheDaimond.Helper
                     cmd.Parameters.AddWithValue("@Id", Id);
                     using (MySqlDataReader reader = cmd.ExecuteReader())
                     {
-                        decimal grams = 0;
-                        string gramsStr = reader["Grams"]?.ToString();
-                        decimal.TryParse(gramsStr, out grams);
                         while (reader.Read())
                         {
                              product = new Product
@@ -135,7 +129,7 @@ namespace RadheDaimond.Helper
                                 Id = reader.GetInt32("Id"),
                                 Name = reader.GetString("Name"),
                                 PackageNo = reader.GetString("PackageNo"),
-                                Grams = grams,
+                                Grams = reader.GetString("Grams"),
                                 Start_Date = reader.GetString("Start_Date"),
                                 End_Date = reader["End_Date"]?.ToString(),
                                 Product_Price = reader["Product_Price"]?.ToString(),
@@ -214,78 +208,78 @@ namespace RadheDaimond.Helper
             }
         }
 
-        //public List<Product> SearchProductsByName(string name)
-        //{
-        //    List<Product> products = new List<Product>();
+        public List<Product> SearchProductsByName(string name)
+        {
+            List<Product> products = new List<Product>();
 
-        //    using (MySqlConnection conn = new MySqlConnection(connStr))
-        //    {
-        //        conn.Open();
-        //        string query = "SELECT * FROM product WHERE Name LIKE @Name";
+            using (MySqlConnection conn = new MySqlConnection(connStr))
+            {
+                conn.Open();
+                string query = "SELECT * FROM product WHERE Name LIKE @Name";
 
-        //        using (MySqlCommand cmd = new MySqlCommand(query, conn))
-        //        {
-        //            cmd.Parameters.AddWithValue("@Name", "%" + name + "%");
+                using (MySqlCommand cmd = new MySqlCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("@Name", "%" + name + "%");
                     
-        //            using (MySqlDataReader reader = cmd.ExecuteReader())
-        //            {
-        //                while (reader.Read())
-        //                {
-        //                    products.Add(new Product
-        //                    {
-        //                        Id = reader.GetInt32("Id"),
-        //                        Name = reader.GetString("Name"),
-        //                        PackageNo = reader.GetString("PackageNo"),
-        //                        Grams = reader.GetString("Grams"),
-        //                        Start_Date = reader.GetString("Start_Date"),
-        //                        End_Date = reader["End_Date"]?.ToString(),
-        //                        Product_Price = reader["Product_Price"]?.ToString(),
-        //                    });
-        //                }
-        //            }
-        //        }
-        //    }
+                    using (MySqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            products.Add(new Product
+                            {
+                                Id = reader.GetInt32("Id"),
+                                Name = reader.GetString("Name"),
+                                PackageNo = reader.GetString("PackageNo"),
+                                Grams = reader.GetString("Grams"),
+                                Start_Date = reader.GetString("Start_Date"),
+                                End_Date = reader["End_Date"]?.ToString(),
+                                Product_Price = reader["Product_Price"]?.ToString(),
+                            });
+                        }
+                    }
+                }
+            }
 
-        //    return products;
-        //}
+            return products;
+        }
 
 
-        //public List<Product> SearchProductsByDateRange(string startDate, string endDate)
-        //{
-        //    List<Product> products = new List<Product>();
+        public List<Product> SearchProductsByDateRange(string startDate, string endDate)
+        {
+            List<Product> products = new List<Product>();
 
-        //    using (MySqlConnection conn = new MySqlConnection(connStr))
-        //    {
-        //        conn.Open();
-        //        string query = @"SELECT * FROM product 
-        //                 WHERE Start_Date >= @StartDate AND End_Date <= @EndDate";
+            using (MySqlConnection conn = new MySqlConnection(connStr))
+            {
+                conn.Open();
+                string query = @"SELECT * FROM product 
+                         WHERE Start_Date >= @StartDate AND End_Date <= @EndDate";
 
-        //        using (MySqlCommand cmd = new MySqlCommand(query, conn))
-        //        {
-        //            cmd.Parameters.AddWithValue("@StartDate", startDate);
-        //            cmd.Parameters.AddWithValue("@EndDate", endDate);
+                using (MySqlCommand cmd = new MySqlCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("@StartDate", startDate);
+                    cmd.Parameters.AddWithValue("@EndDate", endDate);
 
-        //            using (MySqlDataReader reader = cmd.ExecuteReader())
-        //            {
-        //                while (reader.Read())
-        //                {
-        //                    products.Add(new Product
-        //                    {
-        //                        Id = reader.GetInt32("Id"),
-        //                        Name = reader.GetString("Name"),
-        //                        PackageNo = reader.GetString("PackageNo"),
-        //                        Grams = reader.GetString("Grams"),
-        //                        Start_Date = reader.GetString("Start_Date"),
-        //                        End_Date = reader["End_Date"]?.ToString(),
-        //                        Product_Price = reader["Product_Price"]?.ToString(),
-        //                    });
-        //                }
-        //            }
-        //        }
-        //    }
+                    using (MySqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            products.Add(new Product
+                            {
+                                Id = reader.GetInt32("Id"),
+                                Name = reader.GetString("Name"),
+                                PackageNo = reader.GetString("PackageNo"),
+                                Grams = reader.GetString("Grams"),
+                                Start_Date = reader.GetString("Start_Date"),
+                                End_Date = reader["End_Date"]?.ToString(),
+                                Product_Price = reader["Product_Price"]?.ToString(),
+                            });
+                        }
+                    }
+                }
+            }
 
-        //    return products;
-        //}
+            return products;
+        }
 
 
         //public ProductSearchResult SearchProducts(string startDate, string endDate, string name, int pageNumber, int pageSize, bool ignorePagination = false)
@@ -601,11 +595,9 @@ namespace RadheDaimond.Helper
                             string priceStr = reader["Product_Price"]?.ToString();
                             string totalPrice = "0.00";
 
-                            decimal grams = 0;
-                            if (decimal.TryParse(gramsStr, out  grams) && decimal.TryParse(priceStr, out var price))
+                            if (decimal.TryParse(gramsStr, out var grams) && decimal.TryParse(priceStr, out var price))
                             {
                                 totalPrice = (grams * price).ToString("0.00");
-                                //totalPrice = (grams * price).ToString("0.00");
                             }
 
                             string endDateValue = reader["End_Date"]?.ToString();
@@ -615,7 +607,7 @@ namespace RadheDaimond.Helper
                                 Id = reader.GetInt32("Id"),
                                 Name = reader.GetString("Name"),
                                 PackageNo = reader.GetString("PackageNo"),
-                                Grams = grams,
+                                Grams = gramsStr,
                                 Start_Date = reader.GetString("Start_Date"),
                                 End_Date = endDateValue,
                                 Product_Price = priceStr,
