@@ -274,10 +274,10 @@ const Home = () => {
       IssueDate: item.start_Date,
       Name: item.name,
       PackageNo: item.packageNo,
-      Pieces: item.pics,
-      Crt: item.grams,
-      ProductPrice: item.product_Price,
-      TotalPrice: item.totalPrice,
+      Pieces: Number(item.pics),
+      Crt: Number(item.grams),
+      ProductPrice: Number(item.product_Price),
+      TotalPrice: Number(item.totalPrice),
       ReturnDate: item.end_Date
     }));
 

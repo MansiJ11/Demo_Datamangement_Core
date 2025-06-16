@@ -90,6 +90,7 @@ function AddClient() {
                             className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
                             placeholder="Enter name"
                             required
+                            autoComplete='off'
                         />
                     </div>
                 </div>
