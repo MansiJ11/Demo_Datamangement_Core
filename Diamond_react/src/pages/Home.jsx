@@ -206,7 +206,7 @@ const Home = () => {
     let data = [] // Fetch data for PDF download
 
 
-    data = await fetchList(currentPage, totalItems, true); // Fetch data for PDF download
+    data = await fetchList(1, totalItems, true); // Fetch data for PDF download
 
 
     const doc = new jsPDF();
@@ -264,7 +264,7 @@ const Home = () => {
 
     let data = [] // Fetch data for PDF download
 
-    data = await fetchList(currentPage, totalItems, true); // Fetch data for PDF download
+    data = await fetchList(1, totalItems, true); // Fetch data for PDF download
 
 
     const workbook = XLSX.utils.book_new();
