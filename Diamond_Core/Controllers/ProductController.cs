@@ -75,60 +75,6 @@ namespace Diamond_Core.Controllers
             return isDeleted ? Ok("Product Deleted successfully.") : StatusCode(500);
         }
 
-        //[HttpGet("SearchByName")]
-        //public IActionResult SearchByName(string name)
-        //{
-        //    if (string.IsNullOrWhiteSpace(name))
-        //        return BadRequest("Name parameter is required.");
-
-        //    var result = _productHelper.SearchProductsByName(name);
-
-        //    return result.Any() ? Ok(result) : NotFound();
-        //}
-
-        //[HttpGet("SearchByDate")]
-        //public IActionResult SearchByDate(string startDate, string endDate)
-        //{
-        //    if (string.IsNullOrWhiteSpace(startDate) || string.IsNullOrWhiteSpace(endDate))
-        //        return BadRequest("Start date and end date are required.");
-
-        //    var result = _productHelper.SearchProductsByDateRange(startDate, endDate);
-
-        //    return result.Any() ? Ok(result) : NotFound();
-        //}
-
-        //[HttpGet("Search")]
-        //public IActionResult Search(string? startDate = null,string? endDate = null,string? name = null,int pageNumber = 1,int pageSize = 10)
-        //{
-        //    var result = _productHelper.SearchProducts(startDate, endDate, name, pageNumber, pageSize, false);
-        //    return Ok(result);
-        //}
-
-
-        //[HttpGet("DownloadReport")]
-        //public IActionResult DownloadReport(
-        //    string format = "csv",string? name = null,string? startDate = null,string? endDate = null)
-        //{
-        //    var data = _productHelper.GetSearchProducts(startDate, endDate, name, 1, 1, true); // ignorePagination = true
-
-        //    // Assuming data.Products is the list of Product objects
-        //    decimal totalAmount = data.Products.Sum(p => decimal.TryParse(p.TotalPrice, out var tp) ? tp : 0);
-        //    string totalAmountStr = totalAmount.ToString("0.00");
-        //    string timestamp = DateTime.Now.ToString("yyyy-MM-dd_HH-mm");
-
-        //    if (format.ToLower() == "pdf")
-        //    {
-        //        var pdfBytes = _productHelper.GeneratePdf(data.Products, totalAmountStr);
-        //        return File(pdfBytes, "application/pdf", $"report_{timestamp}.pdf");
-        //    }
-        //    else
-        //    {
-        //        var csv = _productHelper.GenerateCsv(data.Products, totalAmountStr);
-        //        var bytes = Encoding.UTF8.GetBytes(csv);
-        //        return File(bytes, "text/csv", $"report_{timestamp}.csv");
-        //    }
-        //}
-
 
         [HttpGet("GetProducts")]
         public IActionResult GetProducts(
