@@ -116,7 +116,7 @@ const DimandForm = () => {
 
         if (isEdit) {
             try {
-                const response = await fetch(`https://diamond-core.onrender.com/api/Product/EditProduct/${id}`, {
+                const response = await fetch(`https://demo-datamangement-core.onrender.com/api/Product/EditProduct/${id}`, {
                     method: 'PUT', // or 'POST' if backend requires
                     headers: {
                         'Content-Type': 'application/json'
@@ -142,7 +142,7 @@ const DimandForm = () => {
         }
         else {
             try {
-                const response = await fetch('https://diamond-core.onrender.com/api/Product/AddProduct', {
+                const response = await fetch('https://demo-datamangement-core.onrender.com/api/Product/AddProduct', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'

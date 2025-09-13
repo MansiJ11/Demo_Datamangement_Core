@@ -85,7 +85,7 @@ const Home = () => {
 
   useEffect(() => {
     setError(null);
-    fetch('https://diamond-core.onrender.com/api/Product/GetAllClientNames')
+    fetch('https://demo-datamangement-core.onrender.com/api/Product/GetAllClientNames')
       .then((response) => {
         return response.json();
       }).then((data) => {
@@ -115,7 +115,7 @@ const Home = () => {
       size,
     });
     try {
-      const response = await fetch(`https://diamond-core.onrender.com/api/Product/GetProducts?${params}`);
+      const response = await fetch(`https://demo-datamangement-core.onrender.com/api/Product/GetProducts?${params}`);
       if (!response.ok) {
         throw new Error('Network response was not ok ' + response.statusText);
       }
@@ -151,7 +151,7 @@ const Home = () => {
 
     try {
       setLoading(true);
-      const response = await fetch(`https://diamond-core.onrender.com/api/Product/DeleteProduct/${id}`, {
+      const response = await fetch(`https://demo-datamangement-core.onrender.com/api/Product/DeleteProduct/${id}`, {
         method: 'DELETE',
       });
 
@@ -174,7 +174,7 @@ const Home = () => {
 
     try {
       setLoading(true);
-      const response = await fetch(`https://diamond-core.onrender.com/api/Product/EditProduct/${id}`, {
+      const response = await fetch(`https://demo-datamangement-core.onrender.com/api/Product/EditProduct/${id}`, {
         method: 'PUT', // or 'POST' if backend requires
         headers: {
           'Content-Type': 'application/json'
@@ -213,7 +213,7 @@ const Home = () => {
 
     const pageWidth = doc.internal.pageSize.getWidth();
 
-    const title = "Radhe Diamond";
+    const title = "Diamond";
     const totalPriceText = `Total Amount: ${totalPrice}`;
 
     // Center the title
@@ -256,7 +256,7 @@ const Home = () => {
       styles: { fontSize: 8 },
     });
 
-    doc.save('Radhe-Diamond.pdf');
+    doc.save('Diamond.pdf');
   };
 
 
@@ -285,7 +285,7 @@ const Home = () => {
     const worksheet = XLSX.utils.json_to_sheet(dataRows, { origin: "A3" });
 
     // Add title and total price manually
-    XLSX.utils.sheet_add_aoa(worksheet, [["Radhe Diamond"]], { origin: "A1" });
+    XLSX.utils.sheet_add_aoa(worksheet, [["Diamond"]], { origin: "A1" });
     XLSX.utils.sheet_add_aoa(worksheet, [[`Total Amount: ${totalPrice}`]], { origin: "F2" }); // Adjust column F or G if needed
 
     // Merge cells for title row (A1 to H1)
@@ -294,7 +294,7 @@ const Home = () => {
 
     XLSX.utils.book_append_sheet(workbook, worksheet, "Diamond");
 
-    XLSX.writeFile(workbook, "Radhe-Diamond.xlsx");
+    XLSX.writeFile(workbook, "Diamond.xlsx");
   };
 
   return (

@@ -13,6 +13,15 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 // CORS policy — if not already configured, define it
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowFrontend",
+        policy => policy
+            .WithOrigins("http://localhost:7001", "https://demo-datamangement-core-frontend.onrender.com")
+            .AllowAnyHeader()
+            .AllowAnyMethod());
+});
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend",

@@ -21,7 +21,7 @@ function AddClient() {
         setLoading(true);
 
         try {
-            const response = await fetch(`https://diamond-core.onrender.com/api/Product/AddClient`, {
+            const response = await fetch(`https://demo-datamangement-core.onrender.com/api/Product/AddClient`, {
                 method: 'POST', // or 'POST' if backend requires
                 headers: {
                     'Content-Type': 'application/json'
