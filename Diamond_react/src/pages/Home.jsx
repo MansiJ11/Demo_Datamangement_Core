@@ -300,7 +300,7 @@ const Home = () => {
   return (
     <div className="max-w-7xl mx-auto p-4">
       <h1 className="text-3xl font-bold text-center mb-6 flex items-center justify-center gap-2">
-        <span role="img" aria-label="diamond">💎</span> Radhe Diamond
+        <span role="img" aria-label="diamond">💎</span> Diamond
       </h1>
       <div className="flex flex-row  items-center justify-between mb-4">
         <button className="bg-white text-black rounded px-6 py-2 mb-4 hover:bg-gray-100 text-center shadow-xl" onClick={() => navigate('/Addclient')}>
